@@ -1,10 +1,20 @@
-﻿<html>
-    <head>
-        <title>Index</title>
-    </head>
-    <body>
-        <h1>..</h1>
-    </body>
+﻿@model  Web.Models.Users
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body>
+    <h1>
+
+        
+        <form asp-controller="Home" asp-action="Index" method="post">
+
+            <input placeholder="Username" type="text" asp-for="Username" />
+            <input placeholder="*****" type="password" asp-for="Password" />
+            <input type="submit" value="SignUP" />
+        </form>
+    </h1>
+</body>
 
 </html>
 

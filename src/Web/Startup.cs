@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Web.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web
 {
@@ -35,7 +37,8 @@ namespace Web
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
-
+          var   connection = @"Server=(localdb)\mssqllocaldb;Database=FantasyLeague;Trusted_Connection=True;";
+              services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
             services.AddMvc();
         }
 
