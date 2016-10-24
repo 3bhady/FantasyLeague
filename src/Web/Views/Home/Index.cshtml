@@ -4,12 +4,23 @@
     <title>Index</title>
 </head>
 <body>
-        <form asp-controller="Home" asp-action="Index" method="post">
 
-            <input placeholder="Username" type="text" asp-for="Username" />
-            <input placeholder="*****" type="password" asp-for="Password" />
-            <input type="submit" value="SignUP" />
-        </form>
+       
+        @{if (Model!=null)
+            {
+                <font color="green">Hello @Model.Username !</font>
+            }
+            else
+            {
+                <form asp-controller="Home" asp-action="Index" method="post">
+                    <input placeholder="Username" type="text" asp-for="Username" />
+                    <input placeholder="*****" type="password" asp-for="Password" />
+                    <input type="submit" value="SignUP" />
+                </form>
+
+            }
+        }
+
 </body>
 
 </html>

@@ -50,10 +50,10 @@ namespace Web.Models
 
                 entity.Property(e => e.MatchId).ValueGeneratedNever();
 
-                entity.Property(e => e.MatchTime)
-                    .IsRequired()
-                    .HasColumnType("timestamp")
-                    .ValueGeneratedOnAddOrUpdate();
+                //entity.Property(e => e.MatchTime)
+                //    .IsRequired()
+                //    .HasColumnType("timestamp")
+                //    .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(d => d.AwayTeam)
                     .WithMany(p => p.MatchesAwayTeam)
@@ -83,7 +83,7 @@ namespace Web.Models
 
     
 
-    public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
 
           
         public virtual DbSet<Matches> Matches { get; set; }

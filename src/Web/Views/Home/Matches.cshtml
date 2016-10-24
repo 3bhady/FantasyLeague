@@ -1,0 +1,16 @@
+﻿
+@model IEnumerable<Web.Models.Matches> 
+
+<html>
+<head>
+</head>
+<body>
+    @{
+        foreach (var i in Model)
+        {
+            @i.HomeTeamScore <br />
+            //@Model[i].AwayTeamId -@Model[i].AwayTeamScore @Model[i].HomeTeamId @Model[i].HomeTeamScore
+        }
+        }
+</body>
+</html>

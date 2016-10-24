@@ -39,7 +39,6 @@ namespace Web
             services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
-    
             services.AddMvc();
         }
 
