@@ -9,22 +9,28 @@ namespace Web.Controllers
 {
     public class HomeController : Controller
     {
-        FantasyLeagueContext _context;
-
-        public HomeController(FantasyLeagueContext context)
+        // define private object holding the database context 
+        private FantasyLeagueContext _DbContext;
+        public HomeController(FantasyLeagueContext Db)
         {
-            _context = context;
-        }
-
+            _DbContext = Db;
+        }      
+        //get request Index Method accessed by /home/Index 
         public IActionResult Index()
         {
             return View();
         }
+        //post request accessed by form where it sends a model of users
+        // the Index method get that model and process it then it determine
+        //whether it is valid for adding to our db context or discarding it
+        [HttpPost]
+        public IActionResult Index(Users user)
+        {  
+            _DbContext.Users.Add(user);
+            _DbContext.SaveChanges();
 
-        public IActionResult Index(Matches Match)
-        {
-            _context.Matches.Add(Match);
-            return View();
+            return View(user);
         }
+      
     }
 }

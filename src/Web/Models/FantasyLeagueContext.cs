@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Web.Models;
 
 namespace Web.Models
 {
@@ -10,8 +12,37 @@ namespace Web.Models
             : base(options)
         { }
 
+        /*  ***thanks   23/10/2016 ******
+         el model builder hena bbsata bst5dmo 3ashan lw 3mlt  database 
+         men el models f hena b2ol kol entity htb2a table ezay 
+         w a el properties bta3et el tables di 
+         bs hena mlhash lzma awi l2nyna 3mlen reverse engineering w 3amlen el
+         models men el database
+         ////////////////////////////////
+         notice to 3bhady:::htla2y el database mech sh8ala l2n el files mech 3ndk
+         w samir zwd el teams wl matches bs astna lma ykmlo
+         /////notice to samir ::kml el matches wl teams w arf3 el query bta3 el tables kol table lw7do
+         f file kol file asmo 3la asm el table
+         
+           * 
+         */
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Users>(entity =>
+            {
+                entity.ToTable("USERS");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasColumnType("varchar(30)");
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasColumnType("varchar(15)");
+            });
             modelBuilder.Entity<Matches>(entity =>
             {
                 entity.HasKey(e => e.MatchId)
@@ -50,7 +81,13 @@ namespace Web.Models
             });
         }
 
+    
+
+    public virtual DbSet<Users> Users { get; set; }
+
+          
         public virtual DbSet<Matches> Matches { get; set; }
         public virtual DbSet<Teams> Teams { get; set; }
+
     }
 }
