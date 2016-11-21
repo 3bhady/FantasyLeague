@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Web.Models;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Web
@@ -36,9 +36,17 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             var connection = @"Server=(localdb)\MSSQLLocalDB;Database=FantasyLeague;Trusted_Connection=True;";
-            services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
+         //   services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddDistributedMemoryCache();
+            services.AddSession(
+                options =>
+                {
+                    options.IdleTimeout = TimeSpan.FromMinutes(6000);
+                    options.CookieName = ".MyCoreApp";
+                });
+
             services.AddMvc();
         }
 
@@ -63,7 +71,7 @@ namespace Web
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http;
+
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -62,8 +65,21 @@
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                    <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                   @{
+                       if (Context.Session.GetInt32("ID") ==null)
+                       {
+                        <li><a asp-controller="Home" asp-action="Signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+
+                        <li><a asp-controller="Home" asp-action="Login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+
+                       }
+                       else
+                       {
+
+                        <li><a asp-controller="Home" asp-action="Logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+                       }
+                }
+                    
                 </ul>
             </div>
         </div>
