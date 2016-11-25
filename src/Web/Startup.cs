@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Microsoft.EntityFrameworkCore;
+using Web.Models;
+using Web.DBEntities;
 
 namespace Web
 {
@@ -36,10 +38,12 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             var connection = @"Server=(localdb)\MSSQLLocalDB;Database=FantasyLeague;Trusted_Connection=True;";
-         //   services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
+       services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
             services.AddDistributedMemoryCache();
+            services.AddScoped<IDBReader, DBReader>();
+
             services.AddSession(
                 options =>
                 {

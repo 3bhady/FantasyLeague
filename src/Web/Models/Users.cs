@@ -23,7 +23,7 @@ namespace Web.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public int SquadId { get; set; }
+  
 
         public virtual ICollection<Bets> BetsUser1 { get; set; }
         public virtual ICollection<Bets> BetsUser2 { get; set; }

@@ -6,11 +6,9 @@ namespace Web.Models
 {
     public partial class FantasyLeagueContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=FantasyLeague;Trusted_Connection=True;");
-        }
+        public FantasyLeagueContext(DbContextOptions<FantasyLeagueContext> options)
+        : base(options) { }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,9 +25,7 @@ namespace Web.Models
                     .HasName("IX_Admins")
                     .IsUnique();
 
-                entity.Property(e => e.AdminId)
-                    .HasColumnName("admin_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.AdminId).HasColumnName("admin_id");
 
                 entity.Property(e => e.Email)
                     .IsRequired()
@@ -595,9 +591,7 @@ namespace Web.Models
                 entity.HasKey(e => e.UserId)
                     .HasName("PK_Users");
 
-                entity.HasIndex(e => new { e.UserId, e.SquadId, e.Email })
-                    .HasName("IX_Users")
-                    .IsUnique();
+           
 
                 entity.Property(e => e.UserId)
                     .HasColumnName("user_id")
@@ -623,7 +617,7 @@ namespace Web.Models
                     .HasColumnName("password")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.SquadId).HasColumnName("squad_id");
+               
 
                 entity.Property(e => e.Username)
                     .IsRequired()
