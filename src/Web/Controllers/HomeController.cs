@@ -10,32 +10,34 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Collections;
-using Web.Entities;
+
 
 namespace Web.Controllers
 {
     public class HomeController : Controller
     {
         // define private object holding the database context 
-  private FantasyLeagueContext _DbContext;
-     private   IDBReader dbreader;
-        public HomeController(FantasyLeagueContext Db,IDBReader dr)
+        private FantasyLeagueContext _DbContext;
+        private IDBReader dbreader;
+        public HomeController(FantasyLeagueContext Db, IDBReader dr)
         {
-          dbreader = dr;
-        _DbContext = Db;
-        }      
+            dbreader = dr;
+            _DbContext = Db;
+        }
         //get request Index Method accessed by /home/Index 
         [HttpGet]
         public IActionResult Index()
         {
+       
 
             return View();
         }
+   
 
 
-
-        public  IActionResult Login()
+        public IActionResult Login()
         {
             return View();
+        }
     }
 }

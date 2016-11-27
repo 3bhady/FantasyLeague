@@ -6,9 +6,11 @@ namespace Web.Models
 {
     public partial class FantasyLeagueContext : DbContext
     {
-        public FantasyLeagueContext(DbContextOptions<FantasyLeagueContext> options)
-        : base(options) { }
-        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=FantasyLeague;Trusted_Connection=True;");
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -182,9 +184,7 @@ namespace Web.Models
                     .HasName("IX_Competitions")
                     .IsUnique();
 
-                entity.Property(e => e.CompetitionId)
-                    .HasColumnName("competition_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.CompetitionId).HasColumnName("competition_id");
 
                 entity.Property(e => e.AdminId).HasColumnName("admin_id");
 
@@ -214,9 +214,7 @@ namespace Web.Models
                 entity.HasKey(e => e.MatchId)
                     .HasName("PK_Matches");
 
-                entity.Property(e => e.MatchId)
-                    .HasColumnName("match_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.MatchId).HasColumnName("match_id");
 
                 entity.Property(e => e.AdminId).HasColumnName("admin_id");
 
@@ -255,9 +253,7 @@ namespace Web.Models
 
             modelBuilder.Entity<News>(entity =>
             {
-                entity.Property(e => e.NewsId)
-                    .HasColumnName("news_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.NewsId).HasColumnName("news_id");
 
                 entity.Property(e => e.AdminId).HasColumnName("admin_id");
 
@@ -317,9 +313,7 @@ namespace Web.Models
                     .HasName("IX_Players")
                     .IsUnique();
 
-                entity.Property(e => e.PlayerId)
-                    .HasColumnName("player_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.Property(e => e.BirthDate)
                     .HasColumnName("birth_date")
@@ -405,9 +399,7 @@ namespace Web.Models
                     .HasName("IX_Squads")
                     .IsUnique();
 
-                entity.Property(e => e.SquadId)
-                    .HasColumnName("squad_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.SquadId).HasColumnName("squad_id");
 
                 entity.Property(e => e.Formation)
                     .IsRequired()
@@ -514,9 +506,7 @@ namespace Web.Models
                     .HasName("IX_Teams")
                     .IsUnique();
 
-                entity.Property(e => e.TeamId)
-                    .HasColumnName("team_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.TeamId).HasColumnName("team_id");
 
                 entity.Property(e => e.Image)
                     .IsRequired()
@@ -591,11 +581,7 @@ namespace Web.Models
                 entity.HasKey(e => e.UserId)
                     .HasName("PK_Users");
 
-           
-
-                entity.Property(e => e.UserId)
-                    .HasColumnName("user_id")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.Property(e => e.Email)
                     .IsRequired()
@@ -616,8 +602,6 @@ namespace Web.Models
                     .IsRequired()
                     .HasColumnName("password")
                     .HasMaxLength(50);
-
-               
 
                 entity.Property(e => e.Username)
                     .IsRequired()
