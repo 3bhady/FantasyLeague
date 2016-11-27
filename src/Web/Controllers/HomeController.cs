@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.Collections;
 using Web.Entities;
 
+
 //using Web.Entities;
 
 namespace Web.Controllers
@@ -32,14 +33,17 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+
             return View();
         }
+
 
         [HttpGet]
         public IActionResult Signup()
         {
             return View();
         }
+   
 
         [HttpPost]
         public IActionResult Signup(SignupViewModel signupViewModel)
@@ -52,6 +56,7 @@ namespace Web.Controllers
 
             //check model state validation
           //  if(ModelState != null && ModelState.IsValid)
+
 
 
 
@@ -86,7 +91,6 @@ namespace Web.Controllers
            
         }
 
-       
 
         public IActionResult Login()
         {
