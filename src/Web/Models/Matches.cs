@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web.Models
 {
@@ -13,6 +15,8 @@ namespace Web.Models
             PlayersMatchesPlayed = new HashSet<PlayersMatchesPlayed>();
         }
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MatchId { get; set; }
         public int HomeTeamId { get; set; }
         public int AwayTeamId { get; set; }

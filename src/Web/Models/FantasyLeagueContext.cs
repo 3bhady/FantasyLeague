@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web.Models
 {
@@ -591,11 +592,13 @@ namespace Web.Models
                 entity.HasKey(e => e.UserId)
                     .HasName("PK_Users");
 
-           
+
 
                 entity.Property(e => e.UserId)
                     .HasColumnName("user_id")
                     .ValueGeneratedNever();
+
+
 
                 entity.Property(e => e.Email)
                     .IsRequired()

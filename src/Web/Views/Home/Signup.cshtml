@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model  Web.Entities.SignupViewModel
+
+<div class="main">
+    <div class="one">
+        <div class="register">
+            <h3>Create your account</h3>
+           
+            <form asp-controller="Home" role="form" asp-action="Signup" method="post">
+                <div>
+                    First Name<br/>
+                    <input type="text" id="fname" spellcheck="false" placeholder="FName" asp-for="@Model.User.FirstName" />
+                </div>
+                <div>
+                    Last Name
+                    <input type="text" id="lname" spellcheck="false" placeholder="LName" asp-for="@Model.User.LastName"/>
+                </div>
+                <div>
+                    Email
+                    <input type="text" id="email" spellcheck="false" placeholder="email@example.com" asp-for="@Model.User.Email" />
+                </div>
+                <div>
+                    Username
+                    
+                    <input type="text" id="username" spellcheck="false" placeholder="username" asp-for="@Model.User.Username"/>
+                </div>
+                <div>
+                    Password
+                   
+                    <input type="password" id="password" asp-for="@Model.User.Password"/>
+                </div>
+                <div>
+                    <label asp-for="PasswordAgain">Password Again</label>
+                    
+                    <input type="password" id="passwordAgain" asp-for="PasswordAgain"/>
+                </div>
+                <div>
+                    <label></label>
+                       
+                    <input type="submit" value="Create Account" id="create-account" class="button" />
+                </div>
+            </form>
+          
+
+</div>
+        </div>
+               
+          
+    </div>

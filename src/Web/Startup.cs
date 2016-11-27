@@ -37,7 +37,8 @@ namespace Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = @"Server=(localdb)\MSSQLLocalDB;Database=FantasyLeague;Trusted_Connection=True;";
+            var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=FantasyLeague;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+           // var connection = @"Server=(localdb)\MSSQLLocalDB;Database=FantasyLeague;Trusted_Connection=True;";
        services.AddDbContext<FantasyLeagueContext>(options => options.UseSqlServer(connection));
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);

@@ -12,30 +12,85 @@ using System.Data.SqlClient;
 using System.Collections;
 using Web.Entities;
 
+//using Web.Entities;
+
 namespace Web.Controllers
 {
     public class HomeController : Controller
     {
         // define private object holding the database context 
-  private FantasyLeagueContext _DbContext;
-     private   IDBReader dbreader;
-        public HomeController(FantasyLeagueContext Db,IDBReader dr)
+        private FantasyLeagueContext _DbContext;
+        private IDBReader dbreader;
+
+        public HomeController(FantasyLeagueContext Db, IDBReader dr)
         {
-          dbreader = dr;
-        _DbContext = Db;
-        }      
+            dbreader = dr;
+            _DbContext = Db;
+        }
+
         //get request Index Method accessed by /home/Index 
         [HttpGet]
         public IActionResult Index()
         {
-
             return View();
         }
 
-
-
-        public  IActionResult Login()
+        [HttpGet]
+        public IActionResult Signup()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Signup(SignupViewModel signupViewModel)
+        {
+            Users User = signupViewModel.User;
+            if (signupViewModel.PasswordAgain != User.Password)
+                return View();
+            if (User.Email == "")
+                return View();
+
+            //check model state validation
+          //  if(ModelState != null && ModelState.IsValid)
+
+
+
+
+            //Validate
+            var Model = _DbContext.Users.FirstOrDefault(r => r.Username == User.Username);
+            if (Model != null)
+            {
+                return View();
+                //  return RedirectToAction("Index", new { id = Model.Id });
+
+            }
+            else
+            {
+
+                _DbContext.Users.Add(User);
+                _DbContext.SaveChanges();
+                HttpContext.Session.SetInt32("id",User.UserId);
+
+                return RedirectToAction("Index");
+                
+            }
+        
+           // Users User;
+           
+            //User = signupViewModel.User;
+            //do validation
+            //check if it already exist in database
+
+        //    _DbContext.Users.Add(User);
+        //    _DbContext.SaveChanges();
+           
+        }
+
+       
+
+        public IActionResult Login()
+        {
+            return View();
+        }
     }
 }
