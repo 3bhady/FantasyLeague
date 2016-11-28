@@ -1,0 +1,17 @@
+﻿@model List<object[]>
+
+<table class="table table-hover table-bordered table-responsive table-striped table-condensed">
+    <tbody>
+       @{
+           foreach (var i in Model)
+           {
+            <tr>
+               @foreach(var x in i)
+                {
+                <td><h1 class="text-center">@x</h1> </td>
+                }
+            </tr>
+           }
+    }
+    </tbody>
+</table>

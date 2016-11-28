@@ -29,9 +29,13 @@ namespace Web.Controllers
             dbreader = dr;
             _DbContext = Db;
         }
+        [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            if (HttpContext.Session.GetInt32("ID") != null)
+                return RedirectToAction("Index");
+
+                return View();
         }
 
         public IActionResult Logout()
@@ -70,6 +74,39 @@ namespace Web.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult Matches()
+        {
+
+            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name" +
+             " FROM Matches, Teams AS T1, Teams AS T2" +
+             " WHERE round_number IN (SELECT MAX(round_number) FROM Matches) AND home_team_id = T1.team_id AND away_team_id = T2.team_id";
+
+            var Model = dbreader.GetData(query, "List");
+            List<object[]> matches = (List < object[] >) Model;
+
+            return View(matches);
+        }
+
+        [HttpGet]
+        public IActionResult AddMatches()
+        {
+            if (HttpContext.Session.GetInt32("AdminID") == null)
+                HttpContext.Session.SetInt32("AdminID",1);
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddMatches(Matches match)
+        {
+
+            string query = "INSERT INTO Matches (home_team_id, away_team_id, round_number, admin_id, date)" +
+            " VALUES ('"+match.HomeTeamId+ "','" + match.AwayTeamId + "','" + match.RoundNumber + "','" + HttpContext.Session.GetInt32("AdminID") + "','" + match.Date + "')";
+
+            dbreader.ExecuteNonQuery(query);
+
+            return View();
+        }
 
         [HttpGet]
         public IActionResult Signup()

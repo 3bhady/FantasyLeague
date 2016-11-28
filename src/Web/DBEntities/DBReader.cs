@@ -28,8 +28,8 @@ namespace Web.DBEntities
     public interface IDBReader
     {
         object GetData(string query,string data_container);
-       // List<object[]> ExecuteReader(string query);
-        string returnstring ();
+        // List<object[]> ExecuteReader(string query);
+        int ExecuteNonQuery(string query);
     }
     public class DBReader:IDBReader
     {
@@ -108,14 +108,19 @@ namespace Web.DBEntities
           //  return DataRecord;
         }
 
-       
-
-        public string returnstring()
+        public int ExecuteNonQuery(string query)
         {
-            
-       var     x = "sadsa";
-            return x;
+            try
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = query;
+               return  command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
         }
-
     }
 }
