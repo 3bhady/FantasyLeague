@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Collections;
+using Microsoft.ApplicationInsights.DataContracts;
 using Web.Entities;
 
 
@@ -28,6 +29,38 @@ namespace Web.Controllers
             dbreader = dr;
             _DbContext = Db;
         }
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+        [HttpPost]
+        public IActionResult Login(Users user)
+        {
+            //Validate
+            var Model =
+                dbreader.GetData("SELECT user_id from Users where username='"+user.Username+ "' AND password='"+user.Password+"'" ,"List");
+
+
+             var LoginViewModel = (List<object[]>) Model;
+
+
+
+            if (LoginViewModel.Count()!=0)
+            {
+                HttpContext.Session.SetInt32("ID", user.UserId);
+                return RedirectToAction("Index");
+            }
+            else
+                return View("Login");
+        }
+
 
         //get request Index Method accessed by /home/Index 
         [HttpGet]
@@ -74,7 +107,7 @@ namespace Web.Controllers
 
                 _DbContext.Users.Add(User);
                 _DbContext.SaveChanges();
-                HttpContext.Session.SetInt32("id",User.UserId);
+                HttpContext.Session.SetInt32("ID",User.UserId);
 
                 return RedirectToAction("Index");
                 
@@ -92,9 +125,6 @@ namespace Web.Controllers
         }
 
 
-        public IActionResult Login()
-        {
-            return View();
-        }
+      
     }
 }
