@@ -32,7 +32,7 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            if (HttpContext.Session.GetInt32("ID") != null)
+            if (HttpContext.Session?.GetInt32("ID") != null)
                 return RedirectToAction("Index");
 
                 return View();
@@ -40,8 +40,8 @@ namespace Web.Controllers
 
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
+            HttpContext.Session?.Clear();
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -56,9 +56,9 @@ namespace Web.Controllers
 
 
 
-            if (LoginViewModel.Count()!=0)
+            if (LoginViewModel != null && LoginViewModel.Count()!=0)
             {
-                HttpContext.Session.SetInt32("ID", user.UserId);
+                HttpContext.Session?.SetInt32("ID", user.UserId);
                 return RedirectToAction("Index");
             }
             else
@@ -91,8 +91,8 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult AddMatches()
         {
-            if (HttpContext.Session.GetInt32("AdminID") == null)
-                HttpContext.Session.SetInt32("AdminID",1);
+            //if (HttpContext.Session?.GetInt32("AdminID") == null)
+              //  HttpContext.Session?.SetInt32("AdminID",1);
             return View();
         }
 
@@ -101,11 +101,11 @@ namespace Web.Controllers
         {
 
             string query = "INSERT INTO Matches (home_team_id, away_team_id, round_number, admin_id, date)" +
-            " VALUES ('"+match.HomeTeamId+ "','" + match.AwayTeamId + "','" + match.RoundNumber + "','" + HttpContext.Session.GetInt32("AdminID") + "','" + match.Date + "')";
+            " VALUES ('"+match.HomeTeamId+ "','" + match.AwayTeamId + "','" + match.RoundNumber + "','" + HttpContext.Session?.GetInt32("AdminID") + "','" + match.Date + "')";
 
             dbreader.ExecuteNonQuery(query);
 
-            return View();
+            return RedirectToAction("AddMatches",match);
         }
 
         [HttpGet]
@@ -118,10 +118,10 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult Signup(SignupViewModel signupViewModel)
         {
-            Users User = signupViewModel.User;
-            if (signupViewModel.PasswordAgain != User.Password)
+            Users user = signupViewModel.User;
+            if (signupViewModel.PasswordAgain != user.Password)
                 return View();
-            if (User.Email == "")
+            if (user.Email == "")
                 return View();
 
             //check model state validation
@@ -132,8 +132,8 @@ namespace Web.Controllers
 
 
             //Validate
-            var Model = _DbContext.Users.FirstOrDefault(r => r.Username == User.Username);
-            if (Model != null)
+            var model = _DbContext.Users.FirstOrDefault(r => r.Username == user.Username);
+            if (model != null)
             {
                 return View();
                 //  return RedirectToAction("Index", new { id = Model.Id });
@@ -141,10 +141,10 @@ namespace Web.Controllers
             }
             else
             {
-
-                _DbContext.Users.Add(User);
+                
+                _DbContext.Users.Add(user);
                 _DbContext.SaveChanges();
-                HttpContext.Session.SetInt32("ID",User.UserId);
+                HttpContext.Session.SetInt32("ID",user.UserId);
 
                 return RedirectToAction("Index");
                 
@@ -160,8 +160,31 @@ namespace Web.Controllers
         //    _DbContext.SaveChanges();
            
         }
+        [HttpGet]
+        public IActionResult AdminLogin()
+        {
+            if (HttpContext.Session?.GetInt32("AdminID") != null)
+                return RedirectToAction("Index");
+            return View();
+        }
+        [HttpPost]
+        public IActionResult AdminLogin(Admins admin)
+        {
+            var Model =
+              dbreader.GetData("SELECT admin_id from Admins where username='" + admin.Username + "' AND password='" + admin.Password + "'", "List");
 
 
-      
+            var LoginAdmin = (List<object[]>)Model;
+
+
+
+            if (LoginAdmin != null && LoginAdmin.Count() != 0)
+            {
+                HttpContext.Session?.SetInt32("AdminID", admin.AdminId);
+                return RedirectToAction("Index");
+            }
+            else
+                return View("Login");
+        }
     }
 }

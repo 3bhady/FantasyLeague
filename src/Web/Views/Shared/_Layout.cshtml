@@ -67,7 +67,7 @@
                 </form>
                 <ul class="nav navbar-nav navbar-right">
                    @{
-                       if (Context.Session.GetInt32("ID") == null)
+                       if (Context.Session?.GetInt32("ID") == null&&Context.Session?.GetInt32("AdminID")==null)
                        {
                         <li><a asp-controller="Home" asp-action="Signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                            
