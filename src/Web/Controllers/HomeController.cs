@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Collections;
-
+using Web.ViewModels;
 
 namespace Web.Controllers
 {
@@ -21,6 +21,7 @@ namespace Web.Controllers
         private IDBReader dbreader;
         public HomeController(FantasyLeagueContext Db, IDBReader dr)
         {
+           
             dbreader = dr;
             _DbContext = Db;
         }
@@ -38,6 +39,21 @@ namespace Web.Controllers
         public IActionResult Login()
         {
             return View();
+        }
+        public IActionResult Competitions()
+        {
+            CompetitionsViewModel competitionsViewModel= new CompetitionsViewModel();
+      //to do , select all competitons,users participating , points from
+      //competitions where user
+
+            return View( competitionsViewModel);
+        }
+        [HttpPost]
+        public IActionResult Competitions(Competitions competition)
+        {
+
+            
+            return RedirectToAction("Competitions");
         }
     }
 }
