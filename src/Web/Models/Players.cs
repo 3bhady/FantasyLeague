@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web.Models
 {
@@ -14,6 +16,8 @@ namespace Web.Models
             SquadsPlayersTemp = new HashSet<SquadsPlayersTemp>();
         }
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PlayerId { get; set; }
         public string Name { get; set; }
         public int TeamId { get; set; }

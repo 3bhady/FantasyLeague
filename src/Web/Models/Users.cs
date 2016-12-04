@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Server.Kestrel.Internal.Http;
+
 
 namespace Web.Models
 {
@@ -17,7 +21,11 @@ namespace Web.Models
             UserCompetitionsRequests = new HashSet<UserCompetitionsRequests>();
         }
 
-        public int UserId { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int UserId { get;  set; }
+
+        [MaxLength(20), Required, MinLength(5)]
         public string Username { get; set; }
         public string Password { get; set; }
         public string FirstName { get; set; }

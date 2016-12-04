@@ -1,1 +1,15 @@
-﻿
+﻿@model  Web.Models.Users
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body>
+    <form asp-controller="Home" asp-action="Login" method="post" class="form-group f">
+        <input placeholder="Username" type="text" asp-for="Username" />
+        <input placeholder="*****" type="password" asp-for="Password" />
+        <input type="submit" value="Login" />
+    </form>
+
+</body>
+
+</html>
