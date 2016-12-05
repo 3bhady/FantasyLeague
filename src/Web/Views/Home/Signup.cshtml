@@ -10,7 +10,7 @@
             <form asp-controller="Home" role="form" asp-action="Signup" method="post">
                 <div>
                     First Name<br/>
-                    <input type="text" id="fname" spellcheck="false" placeholder="FName" asp-for="@Model.User.FirstName" />
+                    <input type="text"  id="fname" spellcheck="false" placeholder="FName" asp-for="@Model.User.FirstName" />
                 </div>
                 <div>
                     Last Name
@@ -35,7 +35,7 @@
                     
                     <input type="password" id="passwordAgain" asp-for="PasswordAgain"/>
                 </div>
-               
+                <input type="submit" value="Sign Up" />
             </form>
           
 
@@ -46,5 +46,6 @@
     </div>
 
 <div>
+    <h3>Matches</h3><br />
     @await Component.InvokeAsync("Matches")
 </div>

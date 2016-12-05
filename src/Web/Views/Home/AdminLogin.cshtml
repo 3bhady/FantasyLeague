@@ -1,0 +1,17 @@
+﻿@model Web.Models.Admins
+
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body>
+<form asp-controller="Home" asp-action="AdminLogin" method="post" class="form-group f">
+    <h1>Admin Login</h1>
+    <input placeholder="Username" type="text" asp-for="Username"/>
+    <input placeholder="*****" type="password" asp-for="Password"/>
+    <input type="submit" value="Login"/>
+</form>
+
+</body>
+
+</html>
