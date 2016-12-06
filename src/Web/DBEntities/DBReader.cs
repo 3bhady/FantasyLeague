@@ -41,13 +41,18 @@ namespace Web.DBEntities
             _DbContext = FantasyLeagueDbContext;
             connection = FantasyLeagueDbContext.Database.GetDbConnection();
         }
+
+        public DBReader()
+        {
+        }
+
         //GetData will return  list of objects array or a dictionary which is equivalent to map
         //use List as a second parameter to tell the function to return a list which
         //will be accessed like a 2d array , i.e list[0][1]
         //use Dictionary to access it like map  where each column name as  a key 
         //have it's data in an array :) 
         //god bless the jungle boys  
-      public   object GetData(string query,string container_type)
+        public   object GetData(string query,string container_type)
         {
 
             List<object[]> DataRecord = new List<object[]>();

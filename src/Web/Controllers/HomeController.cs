@@ -75,11 +75,11 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-
+         
             return View();
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public IActionResult Matches()
         {
 
@@ -92,7 +92,7 @@ namespace Web.Controllers
 
             return View(matches);
         }
-
+        */
         [HttpGet]
         public IActionResult AddMatches()
         {
