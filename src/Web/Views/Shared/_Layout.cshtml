@@ -108,7 +108,7 @@
         <h4 class="modal-title">Modal Header</h4>
       </div>
       <div class="modal-body">
-        @Html.Partial("~/Views/Home/Login.cshtml")
+      
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -119,9 +119,11 @@
 </div>
     @RenderBody()
     <hr/>
-    <footer>
-        <p>&copy; Fantasy Super League</p>
-    </footer>
+    <div  style="bottom:1px; position:absolute;">
+      
+            <p>&copy; Fantasy Super League</p>
+       
+    </div>
 </div>
 
     <environment names="Development">

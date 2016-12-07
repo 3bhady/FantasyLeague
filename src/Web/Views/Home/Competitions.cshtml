@@ -1,37 +1,85 @@
 ﻿@model  Web.ViewModels.CompetitionsViewModel
 <h1>@ViewBag.Message</h1>
-<form class="form-horizontal  " asp-action="Competitions" asp-controller="Home" method="post">
+<div class="container">
+    <div class="tab-content">
+    @{ 
 
-    <div class="form-group ">
-        <label class="control-label" asp-for="@Model.newCompetition.Name">Competition Name</label>
-        <input class="form-control" asp-for="@Model.newCompetition.Name" id="focusedInput" type="text">
 
-        <label class="control-label"asp-for="@Model.newCompetition.Code">Competition Code</label>
-        <input class="form-control" asp-for="@Model.newCompetition.Code" id="focusedInput" type="text">
+//print output, write to file etc.
+        }
+        
+        <ul class="nav nav-tabs">
+            <li ><a data-toggle="tab" href="#create">Create </a></li>
+            <li><a data-toggle="tab" href="#join">Join </a></li>
+            <li><a data-toggle="tab" href="#competitions">Competitions</a></li>
+            <li><a class="active" data-toggle="tab" href="#requests">Requests</a></li>
+        </ul>
+        <!-- Create Competition ...-->
+        <div id="create" class="row tab-pane fade  ">
+            <form class=" " asp-action="CreateCompetition" asp-controller="Home" method="post">
 
-        <br />
-        <div class="form-group ">
-            <div class="col-lg-5  ">
+                <div class="form-group ">
+                    <label class="control-label" asp-for="@Model.newCompetition.Name">Competition Name</label>
+                    <input class="form-control" asp-for="@Model.newCompetition.Name" id="focusedInput" type="text">
 
-                <input type="submit" class="btn btn-default " value="Create Competition !">
+                    <label class="control-label" asp-for="@Model.newCompetition.Code">Competition Code</label>
+                    <input class="form-control" asp-for="@Model.newCompetition.Code" id="focusedInput" value="" type="text">
+
+                    <br />
+                    <div class="form-group ">
+                        <div class="col-lg-5  ">
+
+                            <input type="submit" class="btn btn-default " value="Create Competition !">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- join competition-->
+        <div id="join" class="row tab-pane fade ">
+            <form asp-action="JoinCompetition" asp-controller="Home" method="post">
+                <div class="form-group ">
+                    <label class="control-label" asp-for="@Model.newCompetition.Code">Competition Code </label>
+                    <input class="form-control" asp-for="@Model.newCompetition.Code" id="focusedInput" value="" type="text">
+                    <br />
+                    <input type="submit" class="btn btn-default " value="Join Competition !">
+
+                    </div>
+            </form>
+        </div>
+        <!--my competitions -->
+        <div id="competitions" class="row pre-scrollable tab-pane fade ">
+            @{
+                <table class="table table-hover table-bordered table-responsive table-striped table-condensed">
+                    <tr><th>Competition Name</th><th>Competition Code</th></tr>
+                    @foreach (var m in Model.userCompetitions)
+            {
+                        <tr><td><a asp-controller="Home" asp-action="ViewCompetition" asp-route-id="@m[0]"> @m[1]</a> </td> <td>@m[2]</td> </tr>
+
+                    }
+
+                </table>
+            }
             </div>
+            <!-- showing all my competitions .-->
+            <div id="requests" class="row pre-scrollable tab-pane fade in active">
+                @{
+                    <table class="table table-hover table-bordered table-responsive table-striped table-condensed">
+                        <tr><th>Competition Name</th><th>Username</th><th>Request</th></tr>
+                        @foreach (var m in Model.competitionsRequests)
+            {
+                            <tr>   <td>@m[0]</td><td>@m[1]</td><td><a asp-controller="Home" asp-action="AcceptCompetitionRequest" asp-route-id="@m[4]" asp-route-key="@m[2]">Accept</a>    </td></tr>
+
+                        }
+
+                    </table>
+                }
+
+            </div>
+
+
+
+
         </div>
     </div>
-</form>
-
-<form class="form-horizontal ">
-
-
-    <div class="form-group">
-        <label class="control-label" for="focusedInput"> Competition Code</label>
-        <input class="form-control" id="focusedInput" type="text" value="">
-        <br />
-
-        <div class="form-group ">
-            <div class="col-lg-5  ">
-
-                <input type="submit" class="btn btn-default " value="Join Competition !">
-            </div>
-        </div>
-    </div>
-</form>

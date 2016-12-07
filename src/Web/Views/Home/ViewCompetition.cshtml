@@ -1,0 +1,22 @@
+﻿@model List<object[]>
+
+
+<table class="table table-hover table-bordered table-responsive table-striped ">
+<tr><th>Username</th><th>points</th></tr>
+    @{
+        foreach (var x in Model)
+        {
+            <tr>
+               @foreach(var y in x)
+                {
+                <td>@y</td>
+
+                }
+            </tr>
+        }
+
+
+    }
+
+
+    </table>

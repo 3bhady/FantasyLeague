@@ -81,7 +81,11 @@ namespace Web
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}/{key?}");
+                routes.MapRoute(
+    name: "competitions",
+    template: "{action}/{id?}/{key?}",
+    defaults: new { controller = "Home", action = "Index" });
             });
         }
     }
