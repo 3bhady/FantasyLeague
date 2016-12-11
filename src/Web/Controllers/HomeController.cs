@@ -223,24 +223,45 @@ namespace Web.Controllers
             query = "insert into Competitions(name,code,admin_id)" +
                 "values('" + name + "','" + code + "','" + HttpContext.Session.GetInt32("ID") + "')";
             dbreader.ExecuteNonQuery(query);
+            //inserting the admin
+             query = "select competition_id from Competitions where code = '" + competition.newCompetition.Code + "'";
+            List<object[]> cmp = (List<object[]>)dbreader.GetData(query, "List");
+            query = " insert into User_Competitions_Members values (" + HttpContext.Session.GetInt32("ID") + "," +(int)cmp[0][0] + ")";
+            int x = dbreader.ExecuteNonQuery(query);
 
             return RedirectToAction("Competitions");
         }
-        //requested when joining a competition .
+        //requested when joining a comp etition .
         public IActionResult JoinCompetition(CompetitionsViewModel competition)
         {
-            string query = "select competition_id from Competitions where code = '" + competition.newCompetition.Code+"'";
+            string query = "select competition_id,admin_id from Competitions where code = '" + competition.newCompetition.Code+"'";
             List<object[]> cmp = (List<object[]>)dbreader.GetData(query, "List");
             if (cmp.Count==0)
             {
                 TempData["Message"] = " dude, there is no competition with such a code ! ";
                 return RedirectToAction("Competitions");
             }
-
-             query = " insert into User_Competitions_Requests values (" + HttpContext.Session.GetInt32("ID") + "," + cmp[0][0] + ")";
+            if ((int)cmp[0][1] == (int) HttpContext.Session.GetInt32("ID"))
+            {
+                TempData["Message"] = " What if i told you that you are the admin of that competition "+
+                    " does the admin need request ?!! ";
+                return RedirectToAction("Competitions");
+            }
+            //check if he is a member 
+            query = " select u.user_id from User_Competitions_Members as u  " +
+                " where   u.user_id= " + (int)HttpContext.Session.GetInt32("ID") + " and " +
+                " competition_id = " + cmp[0][0];
+            List<object[]> y =(List<object[]>) dbreader.GetData(query,"List");
+            if ( y.Count !=0)
+            {
+                TempData["Message"] = " remember, you are a member :)  ";
+                return RedirectToAction("Competitions");
+            }
+            query = " insert into User_Competitions_Requests values (" + HttpContext.Session.GetInt32("ID") + "," + cmp[0][0] + ")";
             int x = dbreader.ExecuteNonQuery(query);
+            
             if (x == -1) {
-                TempData["Message"] = " What if i told you that you are already in that competition !! ";
+                TempData["Message"] = " What if i told you that you have already sent request to join the competition !! ";
             }
           
             return RedirectToAction("Competitions");
@@ -258,7 +279,7 @@ namespace Web.Controllers
         }
         public List<object[]> GetMyCompetitions()
         {
-            string query = "select competition_id,name,code from Competitions where " +
+            string query = "select competition_id,name,code,admin_id from Competitions where " +
                  " competition_id in " + " ( select competition_id from " +
                  " User_Competitions_Members  where user_id = " + HttpContext.Session.GetInt32("ID") + " )";
             List<object[]> result = (List < object[] > )dbreader.GetData(query, "List");

@@ -1,4 +1,5 @@
 ﻿@model  Web.ViewModels.CompetitionsViewModel
+@using Microsoft.AspNetCore.Http;
 <h1>@ViewBag.Message</h1>
 <div class="container">
     <div class="tab-content">
@@ -51,11 +52,23 @@
         <!--my competitions -->
         <div id="competitions" class="row pre-scrollable tab-pane fade ">
             @{
+             
                 <table class="table table-hover table-bordered table-responsive table-striped table-condensed">
-                    <tr><th>Competition Name</th><th>Competition Code</th></tr>
+                    <tr><th>Competition Name</th><th>Competition Code</th><th>role</th></tr>
                     @foreach (var m in Model.userCompetitions)
-            {
-                        <tr><td><a asp-controller="Home" asp-action="ViewCompetition" asp-route-id="@m[0]"> @m[1]</a> </td> <td>@m[2]</td> </tr>
+            {     
+                        <tr><td><a asp-controller="Home" asp-action="ViewCompetition" asp-route-id="@m[0]"> @m[1]</a> </td> <td>@m[2]</td>
+                            @if ((int)Context.Session.GetInt32("ID") == (int)m[3])
+                            {
+                             <td> admin</td>   
+
+                            }
+                            else
+                            {
+                                <td>member</td>
+
+                            }
+                            </tr>
 
                     }
 
@@ -69,7 +82,7 @@
                         <tr><th>Competition Name</th><th>Username</th><th>Request</th></tr>
                         @foreach (var m in Model.competitionsRequests)
             {
-                            <tr>   <td>@m[0]</td><td>@m[1]</td><td><a asp-controller="Home" asp-action="AcceptCompetitionRequest" asp-route-id="@m[4]" asp-route-key="@m[2]">Accept</a>    </td></tr>
+                            <tr>   <td>@m[0]</td><td>@m[3]</td><td><a asp-controller="Home" asp-action="AcceptCompetitionRequest" asp-route-id="@m[4]" asp-route-key="@m[2]">Accept</a>    </td></tr>
 
                         }
 
