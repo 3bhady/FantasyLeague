@@ -15,6 +15,7 @@ using Web.ViewModels;
 
 using Microsoft.ApplicationInsights.DataContracts;
 using Web.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 
@@ -79,38 +80,116 @@ namespace Web.Controllers
             return View();
         }
 
-        /*[HttpGet]
-        public IActionResult Matches()
+        [HttpGet]
+        public IActionResult InsertMatchResult()
         {
+            // if (HttpContext.Session?.GetInt32("AdminID") != null)
+            //    return RedirectToAction("AdminLogin");
 
-            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name" +
+            MatchesViewModel ViewModel = new MatchesViewModel();
+            ViewModel.RoundMatches = new List<SelectListItem>();
+
+            //todo:add date check
+
+            string query = "SELECT match_id,T1.name,T2.name" +
              " FROM Matches, Teams AS T1, Teams AS T2" +
              " WHERE round_number IN (SELECT MAX(round_number) FROM Matches) AND home_team_id = T1.team_id AND away_team_id = T2.team_id";
 
-            var Model = dbreader.GetData(query, "List");
-            List<object[]> matches = (List < object[] >) Model;
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
 
-            return View(matches);
-        }
-        */
-        [HttpGet]
-        public IActionResult AddMatches()
-        {
-            //if (HttpContext.Session?.GetInt32("AdminID") == null)
-              //  HttpContext.Session?.SetInt32("AdminID",1);
-            return View();
+            
+            for (int i=0;i<result.Count();i++)
+            {
+                ViewModel.RoundMatches.Add(new SelectListItem { Text = result[i][1].ToString() + 
+                                                                        " - " + 
+                                                                       result[i][2].ToString(),
+                                                                Value = result[i][0].ToString() });
+            }
+
+            return View(ViewModel);
         }
 
         [HttpPost]
-        public IActionResult AddMatches(Matches match)
+        public IActionResult InsertMatchResult(MatchesViewModel VM)
+        {
+            string query = "UPDATE Matches " +
+                            "SET home_team_score = " + VM.UpdatedMatchHomeTeamScore + ", away_team_score = " + VM.UpdatedMatchAwayTeamScore +
+                            " WHERE match_id = " + VM.UpdatedMatchID;
+            dbreader.ExecuteNonQuery(query);
+            ViewBag.Message = " Match Result Updated! ";
+            return View(VM);
+        }
+
+
+
+        //AddView for Admin to add Matches/Players/Teams/NewsPosts
+        [HttpGet]
+        public IActionResult Add()
+        {
+
+            //admin check
+
+            AddViewModel ViewModel = new AddViewModel();
+            ViewModel.AllTeams = new List<SelectListItem>();
+
+
+            string query = " SELECT team_id, name " +
+             " FROM Teams";
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.AllTeams.Add(new SelectListItem
+                {
+                    Text = result[i][1].ToString() ,
+                    Value = result[i][0].ToString()
+                });
+            }
+            return View(ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddMatch(AddViewModel ViewModel)
         {
 
             string query = "INSERT INTO Matches (home_team_id, away_team_id, round_number, admin_id, date)" +
-            " VALUES ('"+match.HomeTeamId+ "','" + match.AwayTeamId + "','" + match.RoundNumber + "','" + HttpContext.Session?.GetInt32("AdminID") + "','" + match.Date + "')";
+            " VALUES ('" + ViewModel.Match.HomeTeamId + "','" + ViewModel.Match.AwayTeamId + "','" + ViewModel.Match.RoundNumber + "','" + HttpContext.Session?.GetInt32("AdminID") + "','" + ViewModel.Match.Date + "')";
 
             dbreader.ExecuteNonQuery(query);
+            return View("Add",ViewModel);
+        }
 
-            return RedirectToAction("AddMatches",match);
+        [HttpPost]
+        public IActionResult AddPlayer(AddViewModel ViewModel)
+        {
+           
+            string query = " INSERT INTO Players(name, team_id, type, birth_date, status, cost)" +
+            " VALUES('" + ViewModel.Player.Name + "','" + ViewModel.SelectedTeamID + "', '" + ViewModel.Player.Type + "', '" + ViewModel.Player.BirthDate + "', ' + Good + ','" + ViewModel.Player.Cost+ "')";
+
+            dbreader.ExecuteNonQuery(query);
+            return View("Add", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddTeam(AddViewModel ViewModel)
+        {
+            string query = "INSERT INTO Teams (name)" +
+                          " VALUES ('" + ViewModel.Team.Name + "')";
+           
+            dbreader.ExecuteNonQuery(query);
+            return View("Add", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddNewsPost(AddViewModel ViewModel)
+        {
+
+            string query = "INSERT INTO News(date, admin_id, title, body) " +
+                          " VALUES ('" + DateTime.Now + "','" + HttpContext.Session?.GetInt32("AdminID") + "', '" + ViewModel.NewsPost.Title + "', '" + ViewModel.NewsPost.Body + "')";
+
+            dbreader.ExecuteNonQuery(query);
+            return View("Add", ViewModel);
         }
 
         [HttpGet]
