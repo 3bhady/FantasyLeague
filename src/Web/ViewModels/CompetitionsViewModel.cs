@@ -8,10 +8,10 @@ namespace Web.ViewModels
 {
     public class CompetitionsViewModel
     {
-        public List<Competitions> userCompetitions;
+        public List<object[]> userCompetitions { get; set; }
         // create competition:
         public Competitions newCompetition { get; set; }
-        
+        public List<Object[]> competitionsRequests { get; set; }
         public CompetitionsViewModel()
         {
             newCompetition = new Competitions();

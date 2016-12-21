@@ -93,11 +93,9 @@ namespace Web.DBEntities
                     }
                     reader.Dispose(); 
                 }
-                connection.Close();
-
-
 
                 reader.Dispose();
+                connection.Close();
 
             }
             catch (Exception e)
@@ -110,6 +108,7 @@ namespace Web.DBEntities
             if(container_type=="List")
             return DataRecord;
             return dic;
+
           //  return DataRecord;
         }
 
@@ -120,10 +119,14 @@ namespace Web.DBEntities
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = query;
-               return  command.ExecuteNonQuery();
+               
+               int x= command.ExecuteNonQuery();
+                connection.Close();
+                return x;
             }
             catch (Exception ex)
             {
+                connection.Close();
                 return -1;
             }
         }
