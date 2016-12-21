@@ -1,0 +1,33 @@
+﻿@using Web.ViewModels
+
+@model MatchesViewModel
+
+<div class="main">
+            <h2>Insert Match Result</h2>
+
+            <form asp-controller="Home" role="form" asp-action="InsertMatchResult" method="post">
+                <div>
+                    Match: 
+                     <select asp-for=@Model.UpdatedMatchID
+                            asp-items="@Model.RoundMatches">
+
+                        <option>Select Match</option>
+
+                    </select>
+                </div>
+                <div>
+                    Home Team Score
+                    <input type="number"  min="0" value ="0" id="roundnumber" spellcheck="false" asp-for="@Model.UpdatedMatchHomeTeamScore" />
+                </div>
+                <div>
+                    Away Team Score
+                    <input type="number" min="0" value="0" id="roundnumber" spellcheck="false" asp-for="@Model.UpdatedMatchAwayTeamScore" />
+                </div>
+                <div>
+                    <input type="submit" value="Update Match Result"/>
+
+                </div>
+            </form>
+    <h1>@ViewBag.Message</h1>
+</div>
+
