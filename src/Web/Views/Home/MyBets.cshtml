@@ -1,0 +1,31 @@
+﻿@using Web.ViewModels
+
+@model MatchesViewModel
+
+@{
+    if (!Model.HaveBetHistory)
+    {
+        <br /> <br />
+        <h1>Your bet history is empty go and bet on some matches.</h1>
+        <br />
+        <h1>Redirecting you now..</h1>
+        <script language="javascript">
+            setTimeout(function () { location.href = "http://localhost:50876" }, 3000);
+        </script>
+    }
+}
+<table class="table table-hover table-bordered table-responsive table-striped table-condensed">
+    <tbody>
+        @{
+            foreach (var i in Model.ResultList)
+            {
+                <tr>
+                    @foreach (var x in i)
+                    {
+                        <td><h1 class="text-center">@x</h1> </td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>
