@@ -1,0 +1,26 @@
+﻿@using Web.ViewModels
+
+@model MatchesViewModel
+@{
+    if (!Model.ValidBetAccept)
+    {
+        <br /> <br />
+        <h1>Sorry but you don't seem to have enough points to accept this bet try another.</h1>
+        <br />
+        <h1>Redirecting you now..</h1>
+        <script language="javascript">
+            setTimeout(function () { location.href = "http://localhost:50876/Home/Bets" }, 3000);
+        </script>
+    }
+    else
+    {
+        <br /> <br />
+        <h1>Bet Accepted successfully.</h1>
+        <br />
+        <h1>Redirecting you now..</h1>
+            <script language="javascript">
+                setTimeout(function () { location.href = "http://localhost:50876/Home/Bets" }, 3000);
+        </script>
+        
+    }
+}
