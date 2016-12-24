@@ -4,10 +4,17 @@
 
 <div>
     <ul class="nav nav-pills">
-        <li class="active"><a data-toggle="pill" href="#addmatch">Add Match</a></li>
-        <li><a data-toggle="pill" href="#addplayer">Add Player</a></li>
-        <li><a data-toggle="pill" href="#addteam">Add Team</a></li>
-        <li><a data-toggle="pill" href="#addnewspost">Add News Post</a></li>
+        <li class="active"><a data-toggle="pill" href="#addmatch">Add Match to league</a></li>
+        <li><a data-toggle="pill" href="#updatematchdate">Postpone match</a></li>
+        <li><a data-toggle="pill" href="#removematch">Remove match from league</a></li>
+        <li><a data-toggle="pill" href="#addplayer">Add player to league</a></li>
+        <li><a data-toggle="pill" href="#transferplayer">Transfer player </a></li>
+        <li><a data-toggle="pill" href="#removeplayer">Remove player from league</a></li>
+        <li><a data-toggle="pill" href="#addteam">Add team</a></li>
+        <li><a data-toggle="pill" href="#removeteam">Remove team</a></li>
+        <li><a data-toggle="pill" href="#addnewspost">Add news post</a></li>
+        <li><a data-toggle="pill" href="#removenewspost">Remove news post</a></li>
+        <li><a data-toggle="pill" href="#updateplayerpoints">Update Player Points</a></li>
     </ul>
 
     <div class="tab-content">
@@ -16,12 +23,22 @@
 
             <form asp-controller="Home" role="form" asp-action="AddMatch" method="post">
                 <div>
-                    Home Team ID
-                    <input type="text" id="hometeamID" spellcheck="false" asp-for="@Model.Match.HomeTeamId" />
+                    Home Team:
+                    <select asp-for=@Model.Match.HomeTeamId
+                            asp-items="@Model.AllTeams">
+
+                        <option>Select Team</option>
+
+                    </select>
                 </div>
                 <div>
-                    Away Team ID
-                    <input type="text" id="awayteamID" spellcheck="false" asp-for="@Model.Match.AwayTeamId" />
+                    Away Team:
+                    <select asp-for=@Model.Match.AwayTeamId
+                            asp-items="@Model.AllTeams">
+
+                        <option>Select Team</option>
+
+                    </select>
                 </div>
                 <div>
                     Round number
@@ -47,7 +64,7 @@
                     <input type="text" id="playername" spellcheck="false" asp-for="@Model.Player.Name" />
                 </div>
                 <div>
-                    Match:
+                    Team:
                     <select asp-for=@Model.SelectedTeamID
                             asp-items="@Model.AllTeams">
 
@@ -104,6 +121,35 @@
                 <div>
                     <br />
                     <input type="submit" value="Post" id="news" class="button" />
+                </div>
+
+            </form>
+        </div>
+        <div id="updateplayerpoints" class="tab-pane fade">
+            <h3>Enter Player Action</h3>
+
+            <form asp-controller="Home" role="form" asp-action="UpdatePlayer" method="post">
+                <div>
+                    Player
+                    <select asp-for=@Model.SelectedPlayerID
+                            asp-items="@Model.AllPlayers">
+
+                        <option>Select Player</option>
+
+                    </select>
+                </div>
+                <div>
+                    Action
+                    <select asp-for=@Model.SelectedAction
+                            asp-items="@Model.PlayerActions">
+
+                        <option>Select Action</option>
+
+                    </select>
+                </div>
+                <div>
+                    <br />
+                    <input type="submit" value="Update" id="playeraction" class="button" />
                 </div>
 
             </form>

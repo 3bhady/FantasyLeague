@@ -1,14 +1,15 @@
 ﻿@model List<object[]>
 
+<h3>Matches</h3><br />
 <table class="table table-hover table-bordered table-responsive table-striped table-condensed">
     <tbody>
         @{
             foreach (var i in Model)
             {
                 <tr>
-                    @foreach (var x in i)
+                    @for (int x = 0; x < 4; x++)
                     {
-                        <td><h1 class="text-center">@x</h1> </td>
+                        <td><h1 class="text-center">@i[x]</h1> </td>
                     }
                 </tr>
             }

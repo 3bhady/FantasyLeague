@@ -16,6 +16,10 @@ namespace Web.ViewModels
         public News NewsPost { get; set; }
         public List<SelectListItem> AllTeams { set; get; }
         public int SelectedTeamID { set; get; }
-
+        public List<SelectListItem> AllPlayers { set; get; }
+        public int SelectedPlayerID { set; get; }
+        public int NewTshirtNumber { set; get; }
+        public List<SelectListItem> PlayerActions { set; get; }
+        public string SelectedAction { set; get; }
     }
 }
