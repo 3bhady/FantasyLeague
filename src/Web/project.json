@@ -28,7 +28,8 @@
     "Microsoft.EntityFrameworkCore": "1.0.1",
     "Microsoft.AspNetCore.Session": "1.0.0",
     "Microsoft.Extensions.Caching.Memory": "1.0.0",
-    "DataTables.AspNet.Core": "2.0.0"
+    "DataTables.AspNet.Core": "2.0.0",
+    "jQuery.UI.Combined": "1.12.1"
   },
 
   "tools": {

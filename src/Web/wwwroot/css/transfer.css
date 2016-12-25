@@ -1,0 +1,23 @@
+﻿
+
+
+.pitch {
+background-color:seagreen;
+border:1px solid red;
+background-repeat: no-repeat;
+height:100%;
+}
+.sub {
+    border:1px solid black;
+}
+.p{
+    border-bottom : 1px solid black;
+    box-shadow: grey 1px 1px 1px 1px;
+    margin-top:1%;
+    color:black;
+    font-family:Arial;
+    font-weight:bold;
+    background-color:#FFFF;
+    height:5%;
+
+}

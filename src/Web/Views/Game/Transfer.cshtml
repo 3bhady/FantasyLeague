@@ -1,0 +1,59 @@
+﻿@model Web.ViewModels.SquadViewModel
+@using Newtonsoft.Json
+@inject IJsonHelper Json;
+    
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<link href="~/css/squad.css" rel="stylesheet" />
+<link href="~/css/transfer.css" rel="stylesheet" />
+<script src="~/lib/jquery-ui/jquery-ui.js"></script>
+<div id="userInfo" class="col-lg-11">
+    <table  class="table">
+      <thead>
+            <tr>
+                <th >Name</th>
+                <th >Points</th>
+                <th >Money</th>
+            </tr>
+        </thead>
+        <tr>
+            <th id="username">Name</th>
+            <th id="points">Points</th>
+            <th id="money">Money</th>
+        </tr>
+
+    </table>
+</div>
+<div id="pitch" class="col-lg-9 pitch" >
+   
+</div>
+<div class="col-lg-3 ">
+    <div class="col-lg-12">
+        <select class="form-control form-inline  " id="filterPlayers" placeholder="HeroTeam" maxlength="15">
+            <option selected disabled hidden>Filter Players </option>
+            <option value="all">All</option>
+            <optgroup label="By Position">
+                <option value="striker"> strikers </option>
+                <option value="goalKeeper">Goal Keepers</option>
+                <option value="midfielder">MidFielders</option>
+                <option value="defender">defenders</option>
+            </optgroup>
+        </select>
+    </div>
+    <div class="col-lg-12" id="players">
+
+    </div>
+</div>
+<button id="save" class="btn col-lg-9"><h1>Save</h1></button>
+
+
+
+
+
+<script src="~/js/transfer.js">
+
+
+</script>
+
+<script>
+   
+</script>
