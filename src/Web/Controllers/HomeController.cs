@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Collections;
-
+using System.Security.Cryptography;
+using System.Text;
 using Web.ViewModels;
 
 using Microsoft.ApplicationInsights.DataContracts;
 using Web.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
 
 
 //using Web.Entities;
@@ -126,7 +126,6 @@ namespace Web.Controllers
         public IActionResult MyBets()
         {
            
-
             bool home = false; //if the player betted on the home team then it's true else it stays false
             bool empty = true; //if there are no available bets then this stays true
             if (HttpContext.Session?.GetInt32("ID") == null)
@@ -135,29 +134,30 @@ namespace Web.Controllers
             MatchesViewModel ViewModel = new MatchesViewModel();
            // ViewModel.RoundMatches = new List<SelectListItem>();
            // ViewModel.ResultList = new List<object[]>();
-            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name " +
-                           " FROM Bets_History,Matches, Teams AS T1, Teams AS T2 " +
-                           " WHERE user1_id=" + user_id +
-                           " AND Bets_History.match_id = Matches.match_id " +
-                           " AND (T1.team_id=home_team_id OR T1.team_id=away_team_id) " +
-                           " AND (T2.team_id=home_team_id OR T2.team_id=away_team_id)";
+            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name,bet_status " +
+                           " FROM Bets_History,Matches,Teams AS T1,Teams AS T2 " +
+                           " WHERE user1_id = "+user_id+" AND Bets_History.match_id = Matches.match_id " +
+                           " AND T1.team_id = home_team_id " +
+                           " AND T2.team_id = away_team_id";
+
+
             ViewModel.ResultList = (List<object[]>)dbreader.GetData(query, "List");
-            if (ViewModel.ResultList.Count != 0)
-            {
-                home = true;
-                empty = false;
-            }
-            else
-            {
-                query =    "SELECT T1.name,home_team_score,away_team_score,T2.name" +
-                           " FROM Bets_History,Matches, Teams AS T1, Teams AS T2 " +
-                           " WHERE user2_id=" + user_id +
-                           " AND Bets_History.match_id = Matches.match_id " +
-                           " AND (T1.team_id=home_team_id OR T1.team_id=away_team_id) " +
-                           " AND (T2.team_id=home_team_id OR T2.team_id=away_team_id)";
-                ViewModel.ResultList = (List<object[]>)dbreader.GetData(query, "List");
-                if( ViewModel.ResultList.Count != 0)
+            
+            
+            
+            
+                query = "SELECT T1.name,home_team_score,away_team_score,T2.name,bet_status " +
+                           " FROM Bets_History,Matches,Teams AS T1,Teams AS T2 " +
+                           " WHERE user2_id = " + user_id + " AND Bets_History.match_id = Matches.match_id " +
+                           " AND T1.team_id = home_team_id " +
+                           " AND T2.team_id = away_team_id";
+                var Result = (List<object[]>)dbreader.GetData(query, "List");
+                if( Result.Count != 0||ViewModel.ResultList.Count!=0)
                     empty = false;
+            for (int i = 0; i < Result.Count; i++)
+            {
+                if (Result[i][4] == "1")
+                    Result[i][4] = "0";
             }
             if (empty)
             {
@@ -167,6 +167,8 @@ namespace Web.Controllers
             {
                 ViewModel.HaveBetHistory = true;
             }
+            for(int i=0;i<Result.Count;i++)
+                ViewModel.ResultList.Add(Result[i]);
 
             return View(ViewModel);
         }
@@ -264,6 +266,8 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult Login(Users user)
         {
+           // user.Password = CalculateMD5Hash(user.Password);
+
             //Validate
             var Model =
                 dbreader.GetData("SELECT user_id from Users where username='"+user.Username+ "' AND password='"+user.Password+"'" ,"List");
@@ -620,9 +624,9 @@ namespace Web.Controllers
                 return View();
             if (user.Email == "")
                 return View();
-
+            user.Password = CalculateMD5Hash(user.Password);
             //check model state validation
-          //  if(ModelState != null && ModelState.IsValid)
+            //  if(ModelState != null && ModelState.IsValid)
 
 
 
@@ -802,5 +806,35 @@ namespace Web.Controllers
             }
 
         }
+        public string CalculateMD5Hash(string input)
+
+        {
+
+            // step 1, calculate MD5 hash from input
+
+            MD5 md5 = System.Security.Cryptography.MD5.Create();
+
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            // step 2, convert byte array to hex string
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+
+            {
+
+                sb.Append(hash[i].ToString("x2"));
+
+            }
+
+            return sb.ToString();
+
+        }
     }
+
+   
+  
 }

@@ -14,6 +14,7 @@
         </script>
     }
 }
+
 <table class="table table-hover table-bordered table-responsive table-striped table-condensed">
     <tbody>
         @{
@@ -23,6 +24,23 @@
                     @foreach (var x in i)
                     {
                         <td><h1 class="text-center">@x</h1> </td>
+                    }
+                </tr>
+            }
+            for (int i = 0; i < Model.ResultList.Count; i++)
+            {
+                <tr>
+                    @for (int j = 0; j < 3; j++)
+                    {
+                        if( Model.ResultList[i][4]=="0")}}
+                         {
+                     <td><h1 style="color: red;" class="text-center">@Model.ResultList[i][j]</h1> </td>
+                         }
+                        else
+                        {
+                    <td><h1 style="color:green;" class="text-center">@Model.ResultList[i][j]</h1> </td>
+
+                        }
                     }
                 </tr>
             }
