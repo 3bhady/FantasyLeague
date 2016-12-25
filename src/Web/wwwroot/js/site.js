@@ -13,8 +13,8 @@ $(document).ready(function () {
             success: function (result) {
                 $('#heroPlayer').empty();
                 options = '';
-                for( i=0; i<result.name.length; i++ ){
-                    options += '<option value= "' + result.player_id[i] + '">' + result.name[i] + '</option>';
+                for( i=0; i<result.pname.length; i++ ){
+                    options += '<option value= "' + result.player_id[i] + '">' + result.pname[i] + '</option>';
                 }
                 console.log(options);
                 $('#heroPlayer').append(options);
