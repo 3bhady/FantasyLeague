@@ -268,7 +268,7 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult Login(Users user)
         {
-           // user.Password = CalculateMD5Hash(user.Password);
+            user.Password = CalculateMD5Hash(user.Password);
 
             //Validate
             var Model =
@@ -696,12 +696,19 @@ namespace Web.Controllers
             return View();
         }
 
-        [HttpGet]
+      /*  [HttpGet]
         public IActionResult UpdateHash()
         {
-
-            return View();
-        }
+            string query = "select user_id,password from Users";
+                 List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            foreach (var user in result)
+            {
+                query="update Users set password='"+CalculateMD5Hash((string)user[1])+"' where user_id="+
+                (int)user[0];
+                dbreader.ExecuteNonQuery(query);
+            }
+            return RedirectToAction("Index");
+        }*/
         [HttpPost]
         public IActionResult Signup(SignupViewModel signupViewModel)
         {
