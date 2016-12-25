@@ -327,7 +327,7 @@ $(document).ready(function () {
                 $("#username").text(String( result.username));
                 $("#points").text(result.points);
                 $("#money").text(result.money);
-
+               
             }
         })
 
