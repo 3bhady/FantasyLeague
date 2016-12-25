@@ -26,7 +26,7 @@
     @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
 </head>
 <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav id="navBar" class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -45,8 +45,9 @@
                        if (Context.Session?.GetInt32("ID") != null)
                        {
                     <li><a asp-area="" asp-controller="Home" asp-action="Competitions">Competitions</a></li>
-                           }
+                    <li><a asp-area="" asp-controller="Game" asp-action="Squad">Squad</a></li>
                        }
+                }
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
 
@@ -116,32 +117,33 @@
 
   </div>
 </div>
-    @RenderBody()
-    <hr/>
-    <div  style="bottom:1px; position:absolute;">
-      
-            <p>&copy; Fantasy Super League</p>
-       
-    </div>
-</div>
+ 
 
+
+</div>
+    @RenderBody()
     <environment names="Development">
+
         <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/jquery-ui/jquery-ui.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
+       
     </environment>
     <environment names="Staging,Production">
+      
         <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
                 asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
                 asp-fallback-test="window.jQuery">
         </script>
+        <script src="~/lib/jquery-ui/jquery-ui.js"></script>
         <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.6/bootstrap.min.js"
                 asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
                 asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
         </script>
-        <script src="~/js/site.min.js" asp-append-version="true"></script>
+     <!--<script src="~/js/site.min.js" asp-append-version="true"></script>-->   
     </environment>
 
-    @RenderSection("scripts", required: false)
+ 
 </body>
 </html>
+<script>$("#navBar").draggable()</script>

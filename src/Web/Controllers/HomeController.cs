@@ -769,8 +769,8 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult ViewCompetition(int id)
         {
-            string query = "select u.username,u.points from users as u " +
-            " where u.user_id in (select user_id from User_Competitions_Members where competition_id = " + id + " )  order by u.points desc";
+            string query = "select u.username,s.points from users as u ,  Squads as s" +
+            " where u.user_id=s.user_id and  u.user_id in (select user_id from User_Competitions_Members where competition_id = " + id + " )  order by u.points desc";
             List<object[]> competitionInfo=( List < object[] > )dbreader.GetData(query,"List");
             return View(competitionInfo);
         }
