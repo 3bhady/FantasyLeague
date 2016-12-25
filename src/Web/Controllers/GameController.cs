@@ -126,14 +126,81 @@ namespace Web.Controllers
             int defenders = Int32.Parse(formation[0]);
             int midFielders = Int32.Parse(formation[1]);
             int strikers = Int32.Parse(formation[2]);
-            string query = "insert into Squads(user_id,hero_team_id,hero_player_id,defenders,midfielders,strikers) Values ( " +
+            string query = "insert into Squads(user_id,hero_team_id,hero_player_id,defenders,midfielders,strikers,money) Values ( " +
                 HttpContext.Session.GetInt32("ID") + " ," + sq.userSquad.HeroTeamId + " ," +
                 sq.userSquad.HeroPlayerId + ", " + defenders + ", " + midFielders + " ," +
-                strikers+" )";
+                strikers+" , 100 )";
             int result= dbreader.ExecuteNonQuery(query);
             
+            BuildSquad(HttpContext.Session.GetInt32("ID"));
             return RedirectToAction("Squad");
+
         }
+        //build squad after user register
+        private void BuildSquad(int? id)
+        {
+         string query = " select squad_id from Squads where user_id = " + id;
+         int squadID =((int) ((List<object[]>)(dbreader.GetData(query, "List")))[0][0]);
+            //get least goalKeepers...
+            query = "select player_id from players where position = 'goalKeeper' order by cost asc";
+            List<object[]> goalKeepers =(List<object[]>) dbreader.GetData(query, "List");
+            //get least defenders
+            query = "select player_id from players where position = 'midfielder' order by cost asc";
+            List<object[]> midfielders = (List<object[]>)dbreader.GetData(query, "List");
+            //get least midfielders 
+            query = "select player_id from players where position = 'defender' order by cost asc";
+            List<object[]> defenders = (List<object[]>)dbreader.GetData(query, "List");
+            //get least strikers 
+            query = "select player_id from players where position = 'striker' order by cost asc";
+            List<object[]> strikers = (List<object[]>)dbreader.GetData(query, "List");
+           
+            //inserting goalKeepers
+            query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+              goalKeepers[0][0] + " , " + " 1  ) ";
+            int result = dbreader.ExecuteNonQuery(query);
+            query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+              goalKeepers[1][0] + " , " + " 0  ) ";
+            result = dbreader.ExecuteNonQuery(query);
+            
+            //inserting Defenders and midfielders ..
+            for(int i=0; i<3; i++)
+            {   //defenders
+                query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+             defenders[i][0] + " , " + " 1  ) ";
+                result = dbreader.ExecuteNonQuery(query);
+                //midfielders
+                query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+           midfielders[i][0] + " , " + " 1  ) ";
+                result = dbreader.ExecuteNonQuery(query);
+            }
+            //inserting  defenders and midfielders isPlaying ->0
+            query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+          defenders[3][0] + " , " + " 0  ) ";
+            result = dbreader.ExecuteNonQuery(query);
+            //midfielders
+            query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+       midfielders[3][0] + " , " + " 0  ) ";
+            result = dbreader.ExecuteNonQuery(query);
+
+            for (int i = 0; i < 4; i++)
+            {  //inserting strikers;;
+                query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+           strikers[i][0] + " , " + " 1  ) ";
+                result = dbreader.ExecuteNonQuery(query);
+            }
+            //inserting strikers isPlaying->0;;
+            query = "insert into Squads_Players_Temp Values ( " + squadID + " , " +
+       strikers[4][0] + " , " + " 0  ) ";
+            result = dbreader.ExecuteNonQuery(query);
+          query =  "select 100 - sum(cost) from Players, Squads_Players_Temp where "+
+              "  Players.player_id = Squads_Players_Temp.player_id and squad_id = " + squadID;
+            
+            double userMoney= ((double)((List<object[]>)(dbreader.GetData(query, "List")))[0][0]);
+            query = "Update Squads Set money= "+userMoney+ " where user_id = " + id;
+            result = dbreader.ExecuteNonQuery(query);
+
+        }
+
         [HttpGet("myPlayers")]
         public IActionResult GetMyPlayers()
         {
@@ -141,11 +208,12 @@ namespace Web.Controllers
             {
                 return (new NotFoundResult());
             }
+            
 
-            string query = "select p.player_id,p.name,p.team_id,p.position,p.image,p.birth_date,p.status,p.cost,"+
-                " t.isPlaying from Players as p,Squads_Players_Temp as t " +
-            " where p.player_id in(select player_id from Squads_Players_Temp where squad_id " +
-            "  = (select squad_id from Squads where user_id = "+ (int)HttpContext.Session.GetInt32("ID") + " and p.player_id = t.player_id )) ";
+            string query = " select p.player_id,p.name,p.team_id,p.position,p.image, " +
+            " p.birth_date,p.status,p.cost, t.isPlaying from Players as p, " +
+            " Squads_Players_Temp as t  where p.player_id = t.player_id and " +
+            " t.squad_id in(select squad_id from Squads where user_id = "+ (int)HttpContext.Session.GetInt32("ID") + ")";
             var result = dbreader.GetData(query, "Dictionary");
 
             return Json(result); 
@@ -186,7 +254,7 @@ namespace Web.Controllers
 
 
 
-
+           
 
             return Json(sp);
         }
