@@ -46,6 +46,8 @@
                        {
                     <li><a asp-area="" asp-controller="Home" asp-action="Competitions">Competitions</a></li>
                     <li><a asp-area="" asp-controller="Game" asp-action="Squad">Squad</a></li>
+                    <li><a asp-area="" asp-controller="Game" asp-action="Transfer">Transfer</a></li>
+                    <li><a asp-area="" asp-route-id="@Context.Session?.GetInt32("ID")" asp-controller="Game" asp-action="Profile">Profile</a></li>
                        }
                 }
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
