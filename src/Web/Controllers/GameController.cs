@@ -32,13 +32,11 @@ namespace Web.Controllers
             dbreader = dr;
             _DbContext = Db;
         }
-        public IActionResult Profile()
+        [HttpGet("/Profile/{id?}")]
+        public IActionResult Profile( int id )
         {
-            if ((int)HttpContext.Session.GetInt32("ID") == null)
-            {
-                return (new NotFoundResult());
-            }
-            return View();
+
+            return View(id);
         }
         [HttpGet("squad")]
         public IActionResult Squad()
@@ -277,6 +275,7 @@ namespace Web.Controllers
                 " where Users.user_id=Squads.user_id and Users.user_id = "+ HttpContext.Session.GetInt32("ID");
 
             var result = dbreader.GetData(query, "Dictionary");
+            
             return Json(result);
         }
         [HttpPost]
@@ -307,6 +306,43 @@ namespace Web.Controllers
         public string test()
         {
             return "sadas";
+        }
+       
+        public IActionResult ProfileInfo(int ? id)
+        {
+            string query = "select Count(*) as competitions from User_Competitions_Members where user_id =" +id;
+            Dictionary<string, List<object>> result = (Dictionary < string, List<object>>) dbreader.GetData(query, "Dictionary");
+
+            query = "select Users.user_id,username,Squads.points ,Squads.money  from Users,Squads " +
+               " where Users.user_id=Squads.user_id and Users.user_id = " + id;
+            Dictionary<string, List<object>> result2 = (Dictionary<string, List<object>>)dbreader.GetData(query, "Dictionary");
+
+         query = "select Count(distinct points ) as rank from Squads where  user_id != "+id+" and points>    " + (result2["points"][0]);
+          Dictionary<string, List<object>> result3 = (Dictionary<string, List <object>>)dbreader.GetData(query, "Dictionary");
+
+            foreach ( var item in result2)
+            {
+                result[item.Key] = item.Value;
+            }
+           foreach(var item in result3 )
+                {
+                result[item.Key] = item.Value;
+            }
+            return Json(result);
+        }
+
+        [HttpGet("/ProfilePlayers/{id?}")]
+        public IActionResult ProfilePlayers(int? id)
+        {
+
+
+            string query = " select p.player_id,p.name,p.team_id, te.name as teamname,p.position,p.image, " +
+            " p.birth_date,p.status,p.cost, t.isPlaying from Players as p,Teams as te " +
+            " ,Squads_Players_Temp as t  where  p.team_id=te.team_id and p.player_id = t.player_id and " +
+            " t.squad_id in(select squad_id from Squads where   user_id = " + id + ")";
+            var result = dbreader.GetData(query, "Dictionary");
+         
+            return Json(result);
         }
     }
 }
