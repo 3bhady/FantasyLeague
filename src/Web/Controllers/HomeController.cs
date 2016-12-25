@@ -696,19 +696,28 @@ namespace Web.Controllers
             return View();
         }
 
-      /*  [HttpGet]
-        public IActionResult UpdateHash()
-        {
-            string query = "select user_id,password from Users";
-                 List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
-            foreach (var user in result)
-            {
-                query="update Users set password='"+CalculateMD5Hash((string)user[1])+"' where user_id="+
-                (int)user[0];
-                dbreader.ExecuteNonQuery(query);
-            }
-            return RedirectToAction("Index");
-        }*/
+        /* [HttpGet]
+            public IActionResult UpdateHash()
+         {
+             string query = "select user_id,password from Users";
+                  List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+             foreach (var user in result)
+             {
+                 query="update Users set password='"+CalculateMD5Hash((string)user[1])+"' where user_id="+
+                 (int)user[0];
+                 dbreader.ExecuteNonQuery(query);
+             }
+             query = "select admin_id,password from Admins";
+             result = (List<object[]>)dbreader.GetData(query, "List");
+             foreach (var user in result)
+             {
+                 query = "update Admins set password='" + CalculateMD5Hash((string)user[1]) + "' where admin_id=" +
+                 (int)user[0];
+                 dbreader.ExecuteNonQuery(query);
+             }
+             return RedirectToAction("Index");
+         }*/
+
         [HttpPost]
         public IActionResult Signup(SignupViewModel signupViewModel)
         {
@@ -867,6 +876,7 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult AdminLogin(Admins admin)
         {
+            admin.Password = CalculateMD5Hash(admin.Password);
             var Model =
               dbreader.GetData("SELECT admin_id from Admins where username='" + admin.Username + "' AND password='" + admin.Password + "'", "List");
 
