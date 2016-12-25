@@ -15,6 +15,7 @@ using Web.ViewModels;
 
 using Microsoft.ApplicationInsights.DataContracts;
 using Web.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 
@@ -34,6 +35,217 @@ namespace Web.Controllers
             dbreader = dr;
             _DbContext = Db;
         }
+
+       
+        public IActionResult GetBetById(string id)
+        {
+            if (HttpContext.Session?.GetInt32("ID") == null)
+                return RedirectToAction("Index");
+            string query = "select * from Bets_Requests where match_id = "+id;
+           var result = dbreader.GetData(query, "dictionary");
+            return Json(result);
+        }
+
+        [HttpGet]
+        public IActionResult ValidateBet(string id)
+        {
+            MatchesViewModel ViewModel = new MatchesViewModel();
+            ViewModel.RoundMatches = new List<SelectListItem>();
+            String[] substrings = id.Split('-');
+            int user2Id = (int)HttpContext.Session.GetInt32("ID");
+            int user1Id = Convert.ToInt32(substrings[0]);
+            int matchId = Convert.ToInt32(substrings[1]);
+            int betPoints = Convert.ToInt32(substrings[2]);
+            int team1Id= Convert.ToInt32(substrings[3]);
+            string query = "select points from Squads where user_id='" + user2Id + "'";
+
+            int userPoints = (int) ((List<object[]>) dbreader.GetData(query, "List"))[0][0];
+            if (userPoints < betPoints)
+            {
+                ViewModel.ValidBetAccept = false;
+
+                return View(ViewModel);
+            }
+            query = "select * from Matches where match_id =" + matchId;
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            int home=(int) result[0][1]; 
+            int away=(int) result[0][2];
+            int team2Id = home == team1Id ? away : home;
+            //user1 , user2,points,matchid,team1,team2
+            query = "insert into Bets Values ("+user1Id+","+user2Id+","+betPoints+","+matchId+","+team1Id+","+team2Id+")";
+            dbreader.ExecuteNonQuery(query);
+
+            query = "Delete From Bets_Requests where user1_id=" + user1Id + " AND match_id=" +matchId;
+            dbreader.ExecuteNonQuery(query);
+            return View(ViewModel);
+        }
+
+    
+        [HttpGet]
+        public IActionResult Bets()
+        {
+            if (HttpContext.Session?.GetInt32("ID") == null)
+                return RedirectToAction("Login");
+            MatchesViewModel ViewModel = new MatchesViewModel();
+            ViewModel.RoundMatches = new List<SelectListItem>();
+
+            //todo:add date check
+
+            string query = "SELECT match_id,T1.name,T2.name" +
+                           " FROM Matches, Teams AS T1, Teams AS T2" +
+                           " WHERE round_number IN (SELECT MAX(round_number) FROM Matches) AND home_team_id = T1.team_id AND away_team_id = T2.team_id " +
+                           " AND match_id not in (select match_id from Bets_Requests where user1_id=" +
+                           HttpContext.Session?.GetInt32("ID") + ") " + " AND " +
+                           "match_id not in (select match_id from Bets where user1_id=" +
+                           HttpContext.Session?.GetInt32("ID") + ") " + " AND " +
+                           "match_id not in (select match_id from Bets where user2_id=" +
+                           HttpContext.Session?.GetInt32("ID") + ")";
+            
+
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            if (result.Count == 0)
+            {
+                ViewModel.CanBet = false;
+            }
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.RoundMatches.Add(new SelectListItem
+                {
+                    Text = result[i][1] + " - " + result[i][2],
+                    Value = result[i][0].ToString()
+                });
+            }
+            query = "select points from Squads where user_id='" + HttpContext.Session?.GetInt32("ID") + "'";
+
+            ViewModel.UserPoints = (int)((List<object[]>)dbreader.GetData(query, "List"))[0][0];
+           // ViewModel.ValidBetAccept = false;
+            return View(ViewModel);
+        }
+
+        public IActionResult MyBets()
+        {
+           
+
+            bool home = false; //if the player betted on the home team then it's true else it stays false
+            bool empty = true; //if there are no available bets then this stays true
+            if (HttpContext.Session?.GetInt32("ID") == null)
+                return RedirectToAction("Login");
+            int user_id = (int) HttpContext.Session?.GetInt32("ID");
+            MatchesViewModel ViewModel = new MatchesViewModel();
+           // ViewModel.RoundMatches = new List<SelectListItem>();
+           // ViewModel.ResultList = new List<object[]>();
+            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name " +
+                           " FROM Bets_History,Matches, Teams AS T1, Teams AS T2 " +
+                           " WHERE user1_id=" + user_id +
+                           " AND Bets_History.match_id = Matches.match_id " +
+                           " AND (T1.team_id=home_team_id OR T1.team_id=away_team_id) " +
+                           " AND (T2.team_id=home_team_id OR T2.team_id=away_team_id)";
+            ViewModel.ResultList = (List<object[]>)dbreader.GetData(query, "List");
+            if (ViewModel.ResultList.Count != 0)
+            {
+                home = true;
+                empty = false;
+            }
+            else
+            {
+                query =    "SELECT T1.name,home_team_score,away_team_score,T2.name" +
+                           " FROM Bets_History,Matches, Teams AS T1, Teams AS T2 " +
+                           " WHERE user2_id=" + user_id +
+                           " AND Bets_History.match_id = Matches.match_id " +
+                           " AND (T1.team_id=home_team_id OR T1.team_id=away_team_id) " +
+                           " AND (T2.team_id=home_team_id OR T2.team_id=away_team_id)";
+                ViewModel.ResultList = (List<object[]>)dbreader.GetData(query, "List");
+                if( ViewModel.ResultList.Count != 0)
+                    empty = false;
+            }
+            if (empty)
+            {
+                ViewModel.HaveBetHistory = false;
+            }
+            else
+            {
+                ViewModel.HaveBetHistory = true;
+            }
+
+            return View(ViewModel);
+        }
+
+
+        [HttpGet]
+        public IActionResult CreateBet()
+        {
+            if (HttpContext.Session?.GetInt32("ID") == null)
+                return RedirectToAction("Login");
+            MatchesViewModel ViewModel = new MatchesViewModel();
+            ViewModel.RoundMatches = new List<SelectListItem>();
+
+            //todo:add date check
+
+            string query = "SELECT match_id,T1.name,T2.name" +
+                           " FROM Matches, Teams AS T1, Teams AS T2" +
+                           " WHERE round_number IN (SELECT MAX(round_number) FROM Matches) AND home_team_id = T1.team_id AND away_team_id = T2.team_id " +
+                           " AND match_id not in (select match_id from Bets_Requests where user1_id=" +
+                           HttpContext.Session?.GetInt32("ID")+") " + " AND " +
+                           "match_id not in (select match_id from Bets where user1_id=" +
+                           HttpContext.Session?.GetInt32("ID") + ") " + " AND " +
+                           "match_id not in (select match_id from Bets where user2_id=" +
+                           HttpContext.Session?.GetInt32("ID") + ")";
+                ;
+
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+
+          
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.RoundMatches.Add(new SelectListItem
+                {
+                    Text = result[i][1].ToString() +" - " +result[i][2].ToString(),
+                    Value = result[i][0].ToString()
+                });
+            }
+             query = "select points from Squads where user_id='" + HttpContext.Session?.GetInt32("ID") + "'";
+
+            ViewModel.UserPoints = (int)((List<object[]>)dbreader.GetData(query, "List"))[0][0];
+            return View(ViewModel);
+        }
+
+
+        [HttpPost]
+        public IActionResult CreateBet(MatchesViewModel ViewModel)
+        {
+            int matchid = ViewModel.UpdatedMatchID;
+            int userid = (int)HttpContext.Session?.GetInt32("ID");
+            int home = ViewModel.HomeID;
+            int homeID;
+            int awayID;
+            int points = ViewModel.BettedValue;
+            string query = "SELECT home_team_id,away_team_id From Matches WHERE match_id='" + matchid+"'";
+
+            //get the home teamid and away team id
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            homeID = (int)result[0][0];
+            awayID = (int) result[0][1];
+
+            //check if the points are actually valid
+            query = "select points from Squads where user_id='" + userid + "'";
+
+            if (points > (int) ((List<object[]>) dbreader.GetData(query, "List"))[0][0])
+                return RedirectToAction("CreateBet");
+            
+            query = "insert into Bets_Requests values ('"+userid+"','"+matchid+"','"+(home==1?homeID:awayID)+"','"+points+
+            "')";
+            dbreader.ExecuteNonQuery(query);
+            query = "update Squads Set points = points - " + points + " where user_id=" + userid;
+            dbreader.ExecuteNonQuery(query);
+
+
+
+
+            return RedirectToAction("CreateBet");
+        }
+
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -79,38 +291,318 @@ namespace Web.Controllers
             return View();
         }
 
-        /*[HttpGet]
-        public IActionResult Matches()
+        [HttpGet]
+        public IActionResult InsertMatchResult()
         {
+            // if (HttpContext.Session?.GetInt32("AdminID") != null)
+            //    return RedirectToAction("AdminLogin");
 
-            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name" +
+            MatchesViewModel ViewModel = new MatchesViewModel();
+            ViewModel.RoundMatches = new List<SelectListItem>();
+
+            //todo:add date check
+
+            string query = "SELECT match_id,T1.name,T2.name" +
              " FROM Matches, Teams AS T1, Teams AS T2" +
              " WHERE round_number IN (SELECT MAX(round_number) FROM Matches) AND home_team_id = T1.team_id AND away_team_id = T2.team_id";
 
-            var Model = dbreader.GetData(query, "List");
-            List<object[]> matches = (List < object[] >) Model;
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
 
-            return View(matches);
-        }
-        */
-        [HttpGet]
-        public IActionResult AddMatches()
-        {
-            //if (HttpContext.Session?.GetInt32("AdminID") == null)
-              //  HttpContext.Session?.SetInt32("AdminID",1);
-            return View();
+            
+            for (int i=0;i<result.Count();i++)
+            {
+                ViewModel.RoundMatches.Add(new SelectListItem { Text = result[i][1].ToString() + 
+                                                                        " - " + 
+                                                                       result[i][2].ToString(),
+                                                                Value = result[i][0].ToString() });
+            }
+
+            return View(ViewModel);
         }
 
         [HttpPost]
-        public IActionResult AddMatches(Matches match)
+        public IActionResult InsertMatchResult(MatchesViewModel VM)
+        {
+            string query = "UPDATE Matches " +
+                            "SET home_team_score = " + VM.UpdatedMatchHomeTeamScore + ", away_team_score = " + VM.UpdatedMatchAwayTeamScore +
+                            " WHERE match_id = " + VM.UpdatedMatchID;
+            dbreader.ExecuteNonQuery(query);
+            ViewBag.Message = " Match Result Updated! ";
+            return View(VM);
+        }
+
+
+/*
+        //AddView for Admin to add Matches/Players/Teams/NewsPosts
+        [HttpGet]
+        public IActionResult Add()
+        {
+
+            //admin check
+
+            if (HttpContext.Session?.GetInt32("AdminID") == null)
+                return RedirectToAction("AdminLogin");
+
+            AddViewModel ViewModel = new AddViewModel();
+            ViewModel.AllTeams = new List<SelectListItem>();
+            ViewModel.AllPlayers = new List<SelectListItem>();
+            ViewModel.PlayerActions = new List<SelectListItem>();
+
+
+            string query = " SELECT team_id, name " +
+             " FROM Teams";
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.AllTeams.Add(new SelectListItem
+                {
+                    Text = result[i][1].ToString() ,
+                    Value = result[i][0].ToString()
+                });
+            }
+
+            query = " SELECT player_id, name " +
+             " FROM Players";
+            result = (List<object[]>)dbreader.GetData(query, "List");
+
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.AllPlayers.Add(new SelectListItem
+                {
+                    Text = result[i][1].ToString(),
+                    Value = result[i][0].ToString()
+                });
+            }
+
+            List<string> PlayerActionsTexts = new List<string>
+            { "Scored a goal","Made assist","Scored own goal","Got yellow card","Got red card", "Saved a goal","Received a goal","Saved a penalty","Missed a penalty"};
+
+            List<string> PlayerActionsValues = new List<string>
+            { "score_goal","make_assist","score_own_goal","get_yellow_card","get_red_card", "save_goal","recieve_goal","save_penalty","miss_penalty"};
+
+            for (int i = 0; i < PlayerActionsTexts.Count(); i++)
+            {
+                ViewModel.PlayerActions.Add(new SelectListItem
+                {
+                    Text = PlayerActionsTexts[i],
+                    Value = PlayerActionsValues[i]
+                });
+            }
+
+            return View(ViewModel);
+        }
+        */
+        [HttpGet]
+        public IActionResult Admin1ControlPanel()
+        {
+
+            //admin check
+
+            if (HttpContext.Session?.GetInt32("AdminID") == null)
+                return RedirectToAction("AdminLogin");
+
+            AddViewModel ViewModel = new AddViewModel();
+            ViewModel.AllTeams = new List<SelectListItem>();
+            ViewModel.AllPlayers = new List<SelectListItem>();
+            ViewModel.PlayerActions = new List<SelectListItem>();
+
+
+            string query = " SELECT team_id, name " +
+             " FROM Teams";
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.AllTeams.Add(new SelectListItem
+                {
+                    Text = result[i][1].ToString(),
+                    Value = result[i][0].ToString()
+                });
+            }
+
+            query = " SELECT player_id, name " +
+             " FROM Players";
+            result = (List<object[]>)dbreader.GetData(query, "List");
+
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                ViewModel.AllPlayers.Add(new SelectListItem
+                {
+                    Text = result[i][1].ToString(),
+                    Value = result[i][0].ToString()
+                });
+            }
+
+            List<string> PlayerActionsTexts = new List<string>
+            { "Scored a goal","Made assist","Scored own goal","Got yellow card","Got red card", "Saved a goal","Received a goal","Saved a penalty","Missed a penalty"};
+
+            List<string> PlayerActionsValues = new List<string>
+            { "score_goal","make_assist","score_own_goal","get_yellow_card","get_red_card", "save_goal","recieve_goal","save_penalty","miss_penalty"};
+
+            for (int i = 0; i < PlayerActionsTexts.Count(); i++)
+            {
+                ViewModel.PlayerActions.Add(new SelectListItem
+                {
+                    Text = PlayerActionsTexts[i],
+                    Value = PlayerActionsValues[i]
+                });
+            }
+
+            return View(ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddMatch(AddViewModel ViewModel)
         {
 
             string query = "INSERT INTO Matches (home_team_id, away_team_id, round_number, admin_id, date)" +
-            " VALUES ('"+match.HomeTeamId+ "','" + match.AwayTeamId + "','" + match.RoundNumber + "','" + HttpContext.Session?.GetInt32("AdminID") + "','" + match.Date + "')";
+            " VALUES ('" + ViewModel.Match.HomeTeamId + "','" + ViewModel.Match.AwayTeamId + "','" + ViewModel.Match.RoundNumber + "','" + HttpContext.Session?.GetInt32("AdminID") + "','" + ViewModel.Match.Date + "')";
+
+            dbreader.ExecuteNonQuery(query);
+            return View("Admin1ControlPanel",ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateMatchDate(AddViewModel ViewModel)
+        {
+
+            string query = " UPDATE Matches " +
+                    " SET date = '" + ViewModel.Match.Date + "' " +
+                    " WHERE match_id = (SELECT match_id " +
+                                      " FROM Matches " +
+                                      " WHERE ( home_team_id = " + ViewModel.Match.HomeTeamId + " OR away_team_id = " + ViewModel.Match.AwayTeamId + " ) AND round_number = " + ViewModel.Match.RoundNumber + ")";
+
+
+            dbreader.ExecuteNonQuery(query);
+            return View("Admin1ControlPanel", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddPlayer(AddViewModel ViewModel)
+        {
+           
+            string query = " INSERT INTO Players(name, team_id, type, birth_date, status, cost,tshirt_number)" +
+            " VALUES('" + ViewModel.Player.Name + "','" + ViewModel.SelectedTeamID + "', '" + ViewModel.Player.Type + "', '" + ViewModel.Player.BirthDate + "', ' Good ','" + ViewModel.Player.Cost+ "','" + ViewModel.Player.TshirtNumber + "')";
+
+            dbreader.ExecuteNonQuery(query);
+            return View("Admin1ControlPanel", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult TransferPlayer(AddViewModel ViewModel)
+        {
+
+            string query = " UPDATE Players " +
+                           " SET team_id = " + ViewModel.SelectedTeamID + " , tshirt_number = " + ViewModel.NewTshirtNumber +
+                           " WHERE player_id = ( SELECT player_id " +
+                                               " FROM Players " +
+                                               " WHERE name = '" + ViewModel.Player.Name + "' AND team_id = " + ViewModel.Player.TeamId + " AND tshirt_number = " + ViewModel.Player.TshirtNumber + ")";
+            dbreader.ExecuteNonQuery(query);
+            return View("Admin1ControlPanel", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddTeam(AddViewModel ViewModel)
+        {
+            string query = "INSERT INTO Teams (name)" +
+                          " VALUES ('" + ViewModel.Team.Name + "')";
+           
+            dbreader.ExecuteNonQuery(query);
+            return View("Admin1ControlPanel", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult AddNewsPost(AddViewModel ViewModel)
+        {
+
+            string query = "INSERT INTO News(date, admin_id, title, body) " +
+                          " VALUES ('" + DateTime.Now + "','" + HttpContext.Session?.GetInt32("AdminID") + "', '" + ViewModel.NewsPost.Title + "', '" + ViewModel.NewsPost.Body + "')";
+
+            dbreader.ExecuteNonQuery(query);
+            return View("Admin1ControlPanel", ViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult UpdatePlayer(AddViewModel ViewModel)
+        {
+
+            //Getting Player Team ID
+            string query = " SELECT team_id " +
+                           " FROM Players " +
+                           " WHERE player_id = " + ViewModel.SelectedPlayerID;
+
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            int TeamID = (int)result[0][0];
+
+            //Getting the match of this round where the player made an action 
+            query = " SELECT match_id " +
+                    " FROM Matches " +
+                    " WHERE ( home_team_id = " + TeamID + " OR away_team_id = " + TeamID + " ) AND round_number = 1 ";
+
+            result = (List<object[]>)dbreader.GetData(query, "List");
+            int MatchID = (int)result[0][0];
+
+            int Goals = 0;
+
+            //Update match score if goals scored
+            if (ViewModel.SelectedAction == "score_goal" || ViewModel.SelectedAction == "score_own_goal")
+            {
+                if (ViewModel.SelectedAction == "score_goal")
+                    Goals++;
+
+                query = " UPDATE Matches ";
+
+                //if player in home team increment his team score if he scored a goal
+                //or increment other team score if he scored an own goal
+                if (ViewModel.SelectedAction == "score_goal")
+                    query += " SET home_team_score = home_team_score + 1 ";
+                else
+                    query += " SET away_team_score = away_team_score + 1 ";
+
+                query += " WHERE match_id = " + MatchID + " AND home_team_id = " + TeamID;
+                int RowsAffected = dbreader.ExecuteNonQuery(query);
+                //RowsAffected = 0 => the player is in the away team
+                if (RowsAffected == 0)
+                {
+                    query = " UPDATE Matches ";
+
+                    if (ViewModel.SelectedAction == "score_goal")
+                        query += " SET away_team_score = away_team_score + 1 ";
+                    else
+                        query += " SET home_team_score = home_team_score + 1 ";
+
+                    query += " WHERE match_id = " + MatchID + " AND away_team_id = " + TeamID;
+                    dbreader.ExecuteNonQuery(query);
+                }
+            }
+
+            //Update player points in the match
+            query = " UPDATE Players_Matches_Played " +
+                    " SET points = points + (SELECT " + ViewModel.SelectedAction +
+                                           " FROM Points_Manager " +
+                                           " WHERE player_type = ( SELECT type " +
+                                                                 " FROM Players " +
+                                                                 " WHERE player_id = " + ViewModel.SelectedPlayerID + " )) , goals = goals + " + Goals +
+                   " WHERE match_id = " + MatchID + " AND player_id = " + ViewModel.SelectedPlayerID;
 
             dbreader.ExecuteNonQuery(query);
 
-            return RedirectToAction("AddMatches",match);
+            //Update points of the squads having this player
+            query = " UPDATE Squads " +
+                    " SET points = points + (SELECT points " +
+                                           " FROM Players_Matches_Played " +
+                                           " WHERE player_id  = " + ViewModel.SelectedPlayerID + " AND match_id = " + MatchID + " )" +
+                    " WHERE squad_id = 1";
+
+            dbreader.ExecuteNonQuery(query);
+
+
+            return View("Admin1ControlPanel", ViewModel);
         }
 
         [HttpGet]
@@ -175,8 +667,9 @@ namespace Web.Controllers
         //get requests of logged in user as well as his competitions 
         [HttpGet]
         public IActionResult Competitions()
-        {if (HttpContext.Session.GetInt32("ID") == null)
-                return RedirectToAction("Index");
+        {
+            if (HttpContext.Session.GetInt32("ID") == null)
+                return RedirectToAction("Login");
             int id = (int)HttpContext.Session.GetInt32("ID");
             CompetitionsViewModel competitionsViewModel= new CompetitionsViewModel();
             //getting all my competitions
@@ -282,7 +775,7 @@ namespace Web.Controllers
             string query = "select competition_id,name,code,admin_id from Competitions where " +
                  " competition_id in " + " ( select competition_id from " +
                  " User_Competitions_Members  where user_id = " + HttpContext.Session.GetInt32("ID") + " )";
-            List<object[]> result = (List < object[] > )dbreader.GetData(query, "List");
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
             return result;
         }
 
@@ -303,7 +796,10 @@ namespace Web.Controllers
                 return RedirectToAction("Index");
             }
             else
-                return View("Login");
+            {
+                ViewBag.Message = " Wrong Username or Password! ";
+                return View("AdminLogin");
+            }
 
         }
     }

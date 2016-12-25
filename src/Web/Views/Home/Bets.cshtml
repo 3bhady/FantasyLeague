@@ -1,0 +1,85 @@
+﻿@using Newtonsoft.Json
+<script src="~/lib/jquery/dist/jquery.js"></script>
+@using Web.ViewModels
+
+@model MatchesViewModel
+
+@{
+    if (!Model.CanBet)
+    {
+        <br/>
+        <br/>
+        <h1>There are no more matches to bet wait for the next round.</h1>
+        <br/>
+        <h1>Redirecting you now..</h1>
+        <script language="javascript">
+            setTimeout(function() { location.href = "http://localhost:50876/Home/Index" }, 3000);
+        </script>
+    }
+    else
+    {
+        <br /><br />
+        <br /><br />
+        <div>
+            Match:
+            <select id="matchFilter"
+                    asp-items="@Model.RoundMatches">
+                <option disabled="disabled">Select Match</option>
+            </select>
+            <br /><br />
+        </div>
+
+        <div id="content">
+
+        </div>
+    }
+}
+
+
+
+
+
+
+
+
+
+
+<script>
+$(document).ready(function () {
+    //hnb3t ajax request
+    var data = $('#matchFilter').val();
+    select();
+    $('#matchFilter').change(select);
+    function select()
+    {
+        data = $('#matchFilter').val();
+        $.ajax({
+        type: 'GET', //type of request
+        data: { id: data },
+        url: '/GetBetById',
+        success: function(result) {
+            console.log(result);
+            //lw el request  rg3t el response hyrg3 f result f  bn3mlo console.log 3ashan nshuf rg3 feh a 
+            var div = '';
+            for (i = 0; i < result.user1_id.length; i++) {
+                div += '<a href="/Home/ValidateBet/' +
+                    result.user1_id[i] +
+                    '-' +
+                    result.match_id[i] +
+                    '-' +
+                    result.points[i] +
+                    '-' +
+                    result.team1_id[i]+
+                    '"> ' +
+                    result.points[i] +
+                    '</a> </br> ';
+            }
+            $('#content').empty().append(div);
+        }
+
+   });
+   }
+
+
+});
+</script>

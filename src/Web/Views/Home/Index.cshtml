@@ -1,5 +1,12 @@
-﻿
-<h3>Matches</h3><br />
+﻿@using Microsoft.AspNetCore.Http;
+
 <div>
+    @{
+        if (Context.Session?.GetInt32("ID") == null && Context.Session?.GetInt32("AdminID") == null)
+        {
+            @await Component.InvokeAsync("Login")
+        }
+    }
+    
     @await Component.InvokeAsync("Matches")
 </div>

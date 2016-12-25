@@ -26,6 +26,7 @@ namespace Web.Models
         public DateTime BirthDate { get; set; }
         public string Status { get; set; }
         public double Cost { get; set; }
+        public int TshirtNumber { get; set; }
 
         public virtual ICollection<News> News { get; set; }
         public virtual ICollection<PlayersMatchesPlayed> PlayersMatchesPlayed { get; set; }

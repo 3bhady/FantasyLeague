@@ -1,0 +1,23 @@
+﻿@model  Web.Models.Users
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        <form asp-controller="Home" role="form" asp-action="Login" method="post" id="login" class="navbar-form navbar-right">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input asp-for="@Model.Username" id="email" class="form-control" name="username" placeholder="Username">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <input asp-for="@Model.Password" id="password" type="password" class="form-control" name="password" placeholder="********">
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

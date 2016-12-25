@@ -1,0 +1,42 @@
+﻿@using Web.ViewModels
+
+@model MatchesViewModel
+
+<div class="main">
+    <h1>Bet on The Winning Team ya m3alem</h1>
+    @{
+        if (Model.RoundMatches.Count == 0)
+        {
+            <h1>no bets available</h1>
+        }
+        else
+        {
+
+            <form asp-controller="Home" role="form" asp-action="CreateBet" method="post">
+                <div>
+                    Match:
+                    <select asp-for=@Model.UpdatedMatchID
+                            asp-items="@Model.RoundMatches">
+                        <option disabled="disabled">Select Match</option>
+                    </select>
+                    <br/><br/>
+                </div>
+
+                <label class="radio-inline"><input type="radio" value="1" asp-for="@Model.HomeID">Home</label>
+                <label class="radio-inline"><input type="radio" value="0" asp-for="@Model.HomeID">Away</label>
+
+                <div>
+                    Betting Points
+                    <input type="number" min="1" value="0" max="@Model.UserPoints" id="roundnumber" spellcheck="false" asp-for="@Model.BettedValue"/>
+                </div>
+
+                <div>
+                    <input type="submit" value="Create Bet"/>
+
+                </div>
+            </form>
+            <h1>@ViewBag.Message</h1>
+        }
+    }
+</div>
+
