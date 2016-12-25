@@ -48,7 +48,7 @@ namespace Web.Controllers
             ViewBag.message = TempData["message"];
             SquadViewModel squadViewModel = new SquadViewModel();
             string query = "select sq.squad_id,sq.user_id,sq.defenders, " +
-            "sq.midfielders,sq.strikers,t.name,p.name,u.points " +
+            "sq.midfielders,sq.strikers,t.name,p.name,sq.points " +
             "from Squads as sq,Teams as t,Players as p , Users as u " +
             "where sq.user_id = u.user_id and u.user_id =" +
             HttpContext.Session.GetInt32("ID");
