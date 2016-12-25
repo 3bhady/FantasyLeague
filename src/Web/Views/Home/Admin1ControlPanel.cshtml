@@ -30,6 +30,9 @@
                 <a class="list-group-item text-center" data-toggle="pill" href="#updateplayerpoints">
                     Update Player Points
                 </a>
+                <a class="list-group-item text-center" data-toggle="pill" href="#endmatch">
+                    End Match
+                </a>
             </div>
         </div>
         <div class="tab-content col-lg-10 col-md-10 col-sm-6 col-xs-4 ">
@@ -225,35 +228,69 @@
 
                 </form>
             </div>
-            <div id="updateplayerpoints" class="tab-pane fade">
-                <h3>Enter Player Action</h3>
+        <div id="updateplayerpoints" class="tab-pane fade">
+            <h3>Enter Player Action</h3>
 
-                <form asp-controller="Home" role="form" asp-action="UpdatePlayer" method="post">
-                    <div>
-                        Player
-                        <select asp-for=@Model.SelectedPlayerID
-                                asp-items="@Model.AllPlayers">
+            <form asp-controller="Home" role="form" asp-action="UpdatePlayer" method="post">
+                <div>
+                    Player
+                    <select asp-for=@Model.SelectedPlayerID
+                            asp-items="@Model.AllPlayers">
 
-                            <option>Select Player</option>
+                        <option>Select Player</option>
 
-                        </select>
-                    </div>
-                    <div>
-                        Action
-                        <select asp-for=@Model.SelectedAction
-                                asp-items="@Model.PlayerActions">
+                    </select>
+                </div>
+                <div>
+                    Action
+                    <select asp-for=@Model.SelectedAction
+                            asp-items="@Model.PlayerActions">
 
-                            <option>Select Action</option>
+                        <option>Select Action</option>
 
-                        </select>
-                    </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Update" id="playeraction" class="button" />
-                    </div>
+                    </select>
+                </div>
+                <div>
+                    <br />
+                    <input type="submit" value="Update" id="playeraction" class="button" />
+                </div>
 
-                </form>
-            </div>
+            </form>
+        </div>
+            
+
+        <div id="endmatch" class="tab-pane fade">
+            <h3>End Match.</h3>
+            <form asp-controller="Home" role="form" asp-action="EndMatch" method="post">
+                <div>
+                    Home Team:
+                    <select asp-for=@Model.Match.HomeTeamId
+                            asp-items="@Model.AllTeams">
+
+                        <option>Select Team</option>
+
+                    </select>
+                </div>
+                <div>
+                    Away Team:
+                    <select asp-for=@Model.Match.AwayTeamId
+                            asp-items="@Model.AllTeams">
+
+                        <option>Select Team</option>
+
+                    </select>
+                </div>
+                <div>
+                    Round number
+                    <input type="text" id="roundnumber" spellcheck="false" asp-for="@Model.Match.RoundNumber" />
+                </div>
+                <div>
+                    <br />
+                    <input type="submit" value="End Match" id="updatematchdate" class="button" />
+                </div>
+
+            </form>
+        </div>
         </div>
     </div>
 </div>

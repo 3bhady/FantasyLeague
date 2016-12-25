@@ -36,7 +36,7 @@ namespace Web.Controllers
             _DbContext = Db;
         }
 
-       
+        
         public IActionResult GetBetById(string id)
         {
             if (HttpContext.Session?.GetInt32("ID") == null)
@@ -156,8 +156,10 @@ namespace Web.Controllers
                     empty = false;
             for (int i = 0; i < Result.Count; i++)
             {
-                if (Result[i][4] == "1")
-                    Result[i][4] = "0";
+                if ((int)Result[i][4] == 1)
+                    Result[i][4] = 0;
+               else if ((int)Result[i][4] == 0)
+                    Result[i][4] = 1;
             }
             if (empty)
             {
@@ -461,6 +463,83 @@ namespace Web.Controllers
         }
 
         [HttpPost]
+        public IActionResult EndMatch(AddViewModel ViewModel)
+        {
+            //fetch the match id from the teams and round number
+            string query = "select match_id,home_team_score,away_team_score from Matches where home_team_id= " + ViewModel.Match.HomeTeamId +
+                           " AND away_team_id= " + ViewModel.Match.AwayTeamId
+                           + " AND round_number= " + ViewModel.Match.RoundNumber;
+            ViewModel.Match.MatchId = (int)  ( (List<object[]>) dbreader.GetData(query, "List"))[0][0];
+            ViewModel.Match.HomeTeamScore=(int)((List<object[]>)dbreader.GetData(query, "List"))[0][1];
+            ViewModel.Match.AwayTeamScore = (int)((List<object[]>)dbreader.GetData(query, "List"))[0][2];
+
+            int winnerId = ViewModel.Match.HomeTeamScore > ViewModel.Match.AwayTeamScore?
+                  ViewModel.Match.HomeTeamScore : ViewModel.Match.AwayTeamScore;
+
+            bool tie = ViewModel.Match.HomeTeamScore == ViewModel.Match.AwayTeamScore;
+
+
+
+            //fetch all the bets for the match that will be ended now
+            query = "select user1_id,user2_id,team1_id,team2_id,points from Bets where match_id="+ ViewModel.Match.MatchId;
+            List<object[]> Bets = (List<object[]>)dbreader.GetData(query, "List");
+
+           
+            //todo:raga3 l ele mt2blsh el bet bta3o floso
+            query = "select user1_id,points from Bets_Requests where match_id=" + ViewModel.Match.MatchId;
+            List<object[]> Refund = (List<object[]>)dbreader.GetData(query, "List");
+            foreach (var refund in Refund)
+            {
+                int user1Id = (int)refund[0];
+                int points = (int)refund[1];
+                query = "update Squads set points=points+ " + points + " where user_id= " + user1Id;
+            }
+
+            //delete all bet requests that haven't been accepted yet //todo:this should be done before the game begins
+            query = "delete from Bets_Requests where match_id=" + ViewModel.Match.MatchId;
+            dbreader.ExecuteNonQuery(query);
+
+            //delete all the bets on the current match
+            query = "delete from Bets where match_id=" + ViewModel.Match.MatchId;
+            dbreader.ExecuteNonQuery(query);
+
+            //todo:add an indication to matches table to indicate that the match has ended
+            
+        
+            //update winners and losers points
+            //move bets to bet history
+            //user1_id,user2_id,team1_id,team2_id,points
+            //0       ,1        ,2       , 3     ,4
+            foreach (var bet in Bets)
+            {
+                int user1Id = (int) bet[0];
+                int user2Id = (int) bet[1];
+                int team1Id = (int) bet[2];
+                int team2Id = (int) bet[3];
+                int points = (int) bet[4];
+                string query2 = "";
+
+                if (tie || team2Id == winnerId)
+                {
+                    query = "Update Squads set points = points + " + points + " where user_id=" + user2Id;
+                    query2= "insert into Bets_History values (" + user1Id + ",0," + ViewModel.Match.MatchId + "," + user2Id + "," +points+
+            ")";
+                    
+                }
+                else
+                {
+                    query = "Update Squads set points = points + " + points + " where user_id=" + user1Id;
+                    query2 = "insert into Bets_History values (" + user1Id + ",1," + ViewModel.Match.MatchId + "," + user2Id + "," + points + ")";
+
+                }
+
+                dbreader.ExecuteNonQuery(query);
+                 dbreader.ExecuteNonQuery(query2);
+            }
+
+            return View("Admin1ControlPanel", ViewModel);
+        }
+        [HttpPost]
         public IActionResult AddMatch(AddViewModel ViewModel)
         {
 
@@ -612,13 +691,21 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Signup()
         {
+            if (HttpContext.Session?.GetInt32("ID") != null)
+                return RedirectToAction("Index");
             return View();
         }
-   
 
+        [HttpGet]
+        public IActionResult UpdateHash()
+        {
+
+            return View();
+        }
         [HttpPost]
         public IActionResult Signup(SignupViewModel signupViewModel)
         {
+            
             Users user = signupViewModel.User;
             if (signupViewModel.PasswordAgain != user.Password)
                 return View();
@@ -630,35 +717,22 @@ namespace Web.Controllers
 
 
 
-
-
             //Validate
-            var model = _DbContext.Users.FirstOrDefault(r => r.Username == user.Username);
-            if (model != null)
-            {
-                return View();
-                //  return RedirectToAction("Index", new { id = Model.Id });
+            string query = "select * from Users where username=" + signupViewModel.User.Username;
+            dbreader.GetData(query, "List");
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            if(result.Count!=0)
+                return RedirectToAction("Signup");
 
-            }
-            else
-            {
+            query = "insert into Users values ('" + signupViewModel.User.Username + "','" + signupViewModel.User.Password + "','" +
+                    signupViewModel.User.FirstName + "','" + signupViewModel.User.LastName + "','" + signupViewModel.User.Email + "')";
+            dbreader.ExecuteNonQuery(query);
                 
-                _DbContext.Users.Add(user);
-                _DbContext.SaveChanges();
+
                 HttpContext.Session.SetInt32("ID",user.UserId);
-
                 return RedirectToAction("Index");
-                
-            }
-        
-           // Users User;
-           
-            //User = signupViewModel.User;
-            //do validation
-            //check if it already exist in database
 
-        //    _DbContext.Users.Add(User);
-        //    _DbContext.SaveChanges();
+       
            
         }
         [HttpGet]
@@ -832,6 +906,12 @@ namespace Web.Controllers
 
             return sb.ToString();
 
+        }
+
+
+        public IActionResult Error()
+        {
+            return View();
         }
     }
 
