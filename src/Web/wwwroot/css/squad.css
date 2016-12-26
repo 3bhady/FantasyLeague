@@ -1,0 +1,86 @@
+﻿.pitch {
+
+
+
+background-color:darkslategrey;
+border:1px solid red;
+    background-repeat: no-repeat;
+    height:30%;
+}
+.player{
+    border:3px solid black;
+ text-align:center;
+    width:10%;     
+  margin-right:0%;
+  
+  position:relative;
+   display:inline-block;
+ 
+
+}
+.marginButton{
+    
+}
+.player h3{
+    font-size:0.8em;
+    font-family:Arial;
+    color:navajowhite;
+    font-weight:bold;
+    font-stretch:narrower;
+}
+.player img {
+ 
+   margin-left:0px;
+  margin-bottom:0%;
+  
+
+
+}
+.playerName{
+    background-color:green;
+}
+.playerPosition{
+    background-color:forestgreen;
+}
+.shirt img{
+  width:100%;
+  border: 1px solid green;
+
+}
+
+.playerText
+{
+     margin:0px;
+}
+.card img{
+    position:relative;
+  
+     width:40%;
+   height:40%;
+   margin: 0 10% 0 0;
+   
+
+}
+
+.card{
+    border:1px solid green;
+    margin :auto ;
+   position : relative;
+}
+.mg{
+   position:relative;
+   margin-bottom:-19%;
+   z-index:0;
+   margin-top:1%;
+}
+
+.clickEffect{
+    background-color:darkseagreen;
+    z-index:0;
+}
+
+.clickEffectS{
+     background-color:darkkhaki;
+     
+    z-index:0;
+}

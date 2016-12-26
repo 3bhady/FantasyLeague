@@ -86,7 +86,16 @@ namespace Web
     name: "competitions",
     template: "{action}/{id?}/{key?}",
     defaults: new { controller = "Home", action = "Index" });
+                routes.MapRoute(
+                    name: "CatchAll",
+                    template: "{*any}",
+
+                    defaults: new {controller = "Home", action = "Error"}
+
+                );
             });
+
+            
         }
     }
 }

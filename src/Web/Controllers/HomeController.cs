@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Collections;
-
+using System.Security.Cryptography;
+using System.Text;
 using Web.ViewModels;
 
 using Microsoft.ApplicationInsights.DataContracts;
 using Web.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
 
 
 //using Web.Entities;
@@ -36,7 +36,7 @@ namespace Web.Controllers
             _DbContext = Db;
         }
 
-       
+        
         public IActionResult GetBetById(string id)
         {
             if (HttpContext.Session?.GetInt32("ID") == null)
@@ -126,7 +126,6 @@ namespace Web.Controllers
         public IActionResult MyBets()
         {
            
-
             bool home = false; //if the player betted on the home team then it's true else it stays false
             bool empty = true; //if there are no available bets then this stays true
             if (HttpContext.Session?.GetInt32("ID") == null)
@@ -135,29 +134,32 @@ namespace Web.Controllers
             MatchesViewModel ViewModel = new MatchesViewModel();
            // ViewModel.RoundMatches = new List<SelectListItem>();
            // ViewModel.ResultList = new List<object[]>();
-            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name " +
-                           " FROM Bets_History,Matches, Teams AS T1, Teams AS T2 " +
-                           " WHERE user1_id=" + user_id +
-                           " AND Bets_History.match_id = Matches.match_id " +
-                           " AND (T1.team_id=home_team_id OR T1.team_id=away_team_id) " +
-                           " AND (T2.team_id=home_team_id OR T2.team_id=away_team_id)";
+            string query = "SELECT T1.name,home_team_score,away_team_score,T2.name,bet_status " +
+                           " FROM Bets_History,Matches,Teams AS T1,Teams AS T2 " +
+                           " WHERE user1_id = "+user_id+" AND Bets_History.match_id = Matches.match_id " +
+                           " AND T1.team_id = home_team_id " +
+                           " AND T2.team_id = away_team_id";
+
+
             ViewModel.ResultList = (List<object[]>)dbreader.GetData(query, "List");
-            if (ViewModel.ResultList.Count != 0)
-            {
-                home = true;
-                empty = false;
-            }
-            else
-            {
-                query =    "SELECT T1.name,home_team_score,away_team_score,T2.name" +
-                           " FROM Bets_History,Matches, Teams AS T1, Teams AS T2 " +
-                           " WHERE user2_id=" + user_id +
-                           " AND Bets_History.match_id = Matches.match_id " +
-                           " AND (T1.team_id=home_team_id OR T1.team_id=away_team_id) " +
-                           " AND (T2.team_id=home_team_id OR T2.team_id=away_team_id)";
-                ViewModel.ResultList = (List<object[]>)dbreader.GetData(query, "List");
-                if( ViewModel.ResultList.Count != 0)
+            
+            
+            
+            
+                query = "SELECT T1.name,home_team_score,away_team_score,T2.name,bet_status " +
+                           " FROM Bets_History,Matches,Teams AS T1,Teams AS T2 " +
+                           " WHERE user2_id = " + user_id + " AND Bets_History.match_id = Matches.match_id " +
+                           " AND T1.team_id = home_team_id " +
+                           " AND T2.team_id = away_team_id";
+                var Result = (List<object[]>)dbreader.GetData(query, "List");
+                if( Result.Count != 0||ViewModel.ResultList.Count!=0)
                     empty = false;
+            for (int i = 0; i < Result.Count; i++)
+            {
+                if ((int)Result[i][4] == 1)
+                    Result[i][4] = 0;
+               else if ((int)Result[i][4] == 0)
+                    Result[i][4] = 1;
             }
             if (empty)
             {
@@ -167,6 +169,8 @@ namespace Web.Controllers
             {
                 ViewModel.HaveBetHistory = true;
             }
+            for(int i=0;i<Result.Count;i++)
+                ViewModel.ResultList.Add(Result[i]);
 
             return View(ViewModel);
         }
@@ -314,6 +318,8 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult Login(Users user)
         {
+            user.Password = CalculateMD5Hash(user.Password);
+
             //Validate
             var Model =
                 dbreader.GetData("SELECT user_id from Users where username='"+user.Username+ "' AND password='"+user.Password+"'" ,"List");
@@ -325,11 +331,9 @@ namespace Web.Controllers
 
             if (LoginViewModel != null && LoginViewModel.Count()!=0)
             {
-                HttpContext.Session.SetInt32("ID", (int)LoginViewModel[0][0]);
-                return RedirectToAction("Index");
+                HttpContext.Session.SetInt32("ID", (int)LoginViewModel[0][0]); 
             }
-            else
-                return View("Login");
+            return RedirectToAction("Index");
         }
 
 
@@ -339,21 +343,6 @@ namespace Web.Controllers
         {
          
             return View();
-        }
-
-        [HttpGet]
-        public IActionResult Player()
-        {
-            PlayerViewModel VM = new PlayerViewModel();
-            VM.Players = new List<object[]>();
-
-            string query = " SELECT player_id, Players.name,Teams.name,type,cost,tshirt_number " +
-                           " FROM Players,Teams " +
-                           " WHERE Players.team_id=Teams.team_id";
-
-            VM.Players = (List<object[]>)dbreader.GetData(query, "List");
-
-            return View(VM);
         }
 
         [HttpGet]
@@ -501,6 +490,83 @@ namespace Web.Controllers
             return View(ViewModel);
         }
 
+        [HttpPost]
+        public IActionResult EndMatch(AddViewModel ViewModel)
+        {
+            //fetch the match id from the teams and round number
+            string query = "select match_id,home_team_score,away_team_score from Matches where home_team_id= " + ViewModel.Match.HomeTeamId +
+                           " AND away_team_id= " + ViewModel.Match.AwayTeamId
+                           + " AND round_number= " + ViewModel.Match.RoundNumber;
+            ViewModel.Match.MatchId = (int)  ( (List<object[]>) dbreader.GetData(query, "List"))[0][0];
+            ViewModel.Match.HomeTeamScore=(int)((List<object[]>)dbreader.GetData(query, "List"))[0][1];
+            ViewModel.Match.AwayTeamScore = (int)((List<object[]>)dbreader.GetData(query, "List"))[0][2];
+
+            int winnerId = ViewModel.Match.HomeTeamScore > ViewModel.Match.AwayTeamScore?
+                  ViewModel.Match.HomeTeamScore : ViewModel.Match.AwayTeamScore;
+
+            bool tie = ViewModel.Match.HomeTeamScore == ViewModel.Match.AwayTeamScore;
+
+
+
+            //fetch all the bets for the match that will be ended now
+            query = "select user1_id,user2_id,team1_id,team2_id,points from Bets where match_id="+ ViewModel.Match.MatchId;
+            List<object[]> Bets = (List<object[]>)dbreader.GetData(query, "List");
+
+           
+            //todo:raga3 l ele mt2blsh el bet bta3o floso
+            query = "select user1_id,points from Bets_Requests where match_id=" + ViewModel.Match.MatchId;
+            List<object[]> Refund = (List<object[]>)dbreader.GetData(query, "List");
+            foreach (var refund in Refund)
+            {
+                int user1Id = (int)refund[0];
+                int points = (int)refund[1];
+                query = "update Squads set points=points+ " + points + " where user_id= " + user1Id;
+            }
+
+            //delete all bet requests that haven't been accepted yet //todo:this should be done before the game begins
+            query = "delete from Bets_Requests where match_id=" + ViewModel.Match.MatchId;
+            dbreader.ExecuteNonQuery(query);
+
+            //delete all the bets on the current match
+            query = "delete from Bets where match_id=" + ViewModel.Match.MatchId;
+            dbreader.ExecuteNonQuery(query);
+
+            //todo:add an indication to matches table to indicate that the match has ended
+            
+        
+            //update winners and losers points
+            //move bets to bet history
+            //user1_id,user2_id,team1_id,team2_id,points
+            //0       ,1        ,2       , 3     ,4
+            foreach (var bet in Bets)
+            {
+                int user1Id = (int) bet[0];
+                int user2Id = (int) bet[1];
+                int team1Id = (int) bet[2];
+                int team2Id = (int) bet[3];
+                int points = (int) bet[4];
+                string query2 = "";
+
+                if (tie || team2Id == winnerId)
+                {
+                    query = "Update Squads set points = points + " + points + " where user_id=" + user2Id;
+                    query2= "insert into Bets_History values (" + user1Id + ",0," + ViewModel.Match.MatchId + "," + user2Id + "," +points+
+            ")";
+                    
+                }
+                else
+                {
+                    query = "Update Squads set points = points + " + points + " where user_id=" + user1Id;
+                    query2 = "insert into Bets_History values (" + user1Id + ",1," + ViewModel.Match.MatchId + "," + user2Id + "," + points + ")";
+
+                }
+
+                dbreader.ExecuteNonQuery(query);
+                 dbreader.ExecuteNonQuery(query2);
+            }
+
+            return View("Admin1ControlPanel", ViewModel);
+        }
         [HttpPost]
         public IActionResult AddMatch(AddViewModel ViewModel)
         {
@@ -653,53 +719,64 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Signup()
         {
+            if (HttpContext.Session?.GetInt32("ID") != null)
+                return RedirectToAction("Index");
             return View();
         }
-   
+
+        /* [HttpGet]
+            public IActionResult UpdateHash()
+         {
+             string query = "select user_id,password from Users";
+                  List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+             foreach (var user in result)
+             {
+                 query="update Users set password='"+CalculateMD5Hash((string)user[1])+"' where user_id="+
+                 (int)user[0];
+                 dbreader.ExecuteNonQuery(query);
+             }
+             query = "select admin_id,password from Admins";
+             result = (List<object[]>)dbreader.GetData(query, "List");
+             foreach (var user in result)
+             {
+                 query = "update Admins set password='" + CalculateMD5Hash((string)user[1]) + "' where admin_id=" +
+                 (int)user[0];
+                 dbreader.ExecuteNonQuery(query);
+             }
+             return RedirectToAction("Index");
+         }*/
 
         [HttpPost]
         public IActionResult Signup(SignupViewModel signupViewModel)
         {
+            
             Users user = signupViewModel.User;
             if (signupViewModel.PasswordAgain != user.Password)
                 return View();
             if (user.Email == "")
                 return View();
-
+            user.Password = CalculateMD5Hash(user.Password);
             //check model state validation
-          //  if(ModelState != null && ModelState.IsValid)
-
-
+            //  if(ModelState != null && ModelState.IsValid)
 
 
 
             //Validate
-            var model = _DbContext.Users.FirstOrDefault(r => r.Username == user.Username);
-            if (model != null)
-            {
-                return View();
-                //  return RedirectToAction("Index", new { id = Model.Id });
+            string query = "select * from Users where username=" + signupViewModel.User.Username;
+            dbreader.GetData(query, "List");
+            List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
+            if(result.Count!=0)
+                return RedirectToAction("Signup");
 
-            }
-            else
-            {
+            query = "insert into Users values ('" + signupViewModel.User.Username + "','" + signupViewModel.User.Password + "','" +
+                    signupViewModel.User.FirstName + "','" + signupViewModel.User.LastName + "','" + signupViewModel.User.Email + "')";
+            dbreader.ExecuteNonQuery(query);
                 
-                _DbContext.Users.Add(user);
-                _DbContext.SaveChanges();
+
                 HttpContext.Session.SetInt32("ID",user.UserId);
-
                 return RedirectToAction("Index");
-                
-            }
-        
-           // Users User;
-           
-            //User = signupViewModel.User;
-            //do validation
-            //check if it already exist in database
 
-        //    _DbContext.Users.Add(User);
-        //    _DbContext.SaveChanges();
+       
            
         }
         [HttpGet]
@@ -811,8 +888,8 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult ViewCompetition(int id)
         {
-            string query = "select u.username,u.points from users as u " +
-            " where u.user_id in (select user_id from User_Competitions_Members where competition_id = " + id + " )  order by u.points desc";
+            string query = "select u.username,s.points from users as u ,  Squads as s" +
+            " where u.user_id=s.user_id and  u.user_id in (select user_id from User_Competitions_Members where competition_id = " + id + " )  order by u.points desc";
             List<object[]> competitionInfo=( List < object[] > )dbreader.GetData(query,"List");
             return View(competitionInfo);
         }
@@ -828,6 +905,7 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult AdminLogin(Admins admin)
         {
+            admin.Password = CalculateMD5Hash(admin.Password);
             var Model =
               dbreader.GetData("SELECT admin_id from Admins where username='" + admin.Username + "' AND password='" + admin.Password + "'", "List");
 
@@ -848,5 +926,41 @@ namespace Web.Controllers
             }
 
         }
+        public string CalculateMD5Hash(string input)
+
+        {
+
+            // step 1, calculate MD5 hash from input
+
+            MD5 md5 = System.Security.Cryptography.MD5.Create();
+
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            // step 2, convert byte array to hex string
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+
+            {
+
+                sb.Append(hash[i].ToString("x2"));
+
+            }
+
+            return sb.ToString();
+
+        }
+
+
+        public IActionResult Error()
+        {
+            return View();
+        }
     }
+
+   
+  
 }
