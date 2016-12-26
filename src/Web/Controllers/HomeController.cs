@@ -194,7 +194,8 @@ namespace Web.Controllers
                            "match_id not in (select match_id from Bets where user1_id=" +
                            HttpContext.Session?.GetInt32("ID") + ") " + " AND " +
                            "match_id not in (select match_id from Bets where user2_id=" +
-                           HttpContext.Session?.GetInt32("ID") + ")";
+                           HttpContext.Session?.GetInt32("ID") + ")"+
+                           " AND started=0";
                 ;
 
             List<object[]> result = (List<object[]>)dbreader.GetData(query, "List");
@@ -394,7 +395,8 @@ namespace Web.Controllers
                         " VALUES(" + (int)SquadPlayers[i][0] + "," + (int)SquadPlayers[i][1] + ",(SELECT MAX(round_number) FROM Matches))";
                 dbreader.ExecuteNonQuery(query);
             }
-            return RedirectToAction("Player");
+
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -509,6 +511,9 @@ namespace Web.Controllers
             bool tie = ViewModel.Match.HomeTeamScore == ViewModel.Match.AwayTeamScore;
 
 
+            //register that the match has started and ended
+            query = "update Matches set started=1 where match_id=" + ViewModel.Match.MatchId;
+            dbreader.ExecuteNonQuery(query);
 
             //fetch all the bets for the match that will be ended now
             query = "select user1_id,user2_id,team1_id,team2_id,points from Bets where match_id="+ ViewModel.Match.MatchId;
