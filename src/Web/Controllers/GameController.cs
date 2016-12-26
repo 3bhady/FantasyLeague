@@ -260,7 +260,8 @@ namespace Web.Controllers
         {
             if ((int)HttpContext.Session.GetInt32("ID") == null)
             {
-                return (new NotFoundResult());
+                return View("/home/index");
+          //      return (new NotFoundResult());
             }
             return View();
         }
@@ -342,6 +343,14 @@ namespace Web.Controllers
             " t.squad_id in(select squad_id from Squads where   user_id = " + id + ")";
             var result = dbreader.GetData(query, "Dictionary");
          
+            return Json(result);
+        }
+        [HttpGet("/Search/{key?}")]
+        public IActionResult SearchEngine(string key )
+        {
+            string query = "Select user_id,username from Users where username like '%" + key + "%'";
+            var result = dbreader.GetData(query, "Dictionary");
+
             return Json(result);
         }
     }

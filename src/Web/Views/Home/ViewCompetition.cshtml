@@ -7,11 +7,8 @@
         foreach (var x in Model)
         {
             <tr>
-               @foreach(var y in x)
-                {
-                <td>@y</td>
-
-                }
+                <td  ><a asp-action="Profile" asp-controller="game" asp-route-id="@x[0]"  >@x[1]</a></td>
+             <td>@x[2]</td>
             </tr>
         }
 
