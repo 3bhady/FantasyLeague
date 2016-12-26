@@ -7,9 +7,14 @@
     @{
         if (Context.Session?.GetInt32("ID") == null && Context.Session?.GetInt32("AdminID") == null)
         {
-            @await Component.InvokeAsync("Login")
-        }
-    }
-    
-    @await Component.InvokeAsync("Matches")
+
+            
+                @await Component.InvokeAsync("Login")
+
+                }
+                }
+    <div class="col-lg-6">
+        @await Component.InvokeAsync("Matches")
+    </div>
 </div>
+

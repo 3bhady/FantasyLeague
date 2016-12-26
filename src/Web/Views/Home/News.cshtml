@@ -1,0 +1,9 @@
+﻿@model List<object[]>
+
+@foreach (var i in Model)
+{
+    <blockquote style ="margin-top:30px"class="breadcrumb">
+        <h2 style="color:crimson">@i[0]</h2>
+        <small>@i[1]</small>
+    </blockquote>
+}

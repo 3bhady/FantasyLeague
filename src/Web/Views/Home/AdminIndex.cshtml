@@ -1,0 +1,182 @@
+﻿@using Web.ViewModels
+
+@model AdminIndexViewModel
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+<div style="padding-top:20px">
+    <ul class="nav nav-pills">
+        <li class="col-sm-5">
+            <a class="text-center" data-toggle="pill" href="#players">
+                Players
+            </a>
+        </li>
+        <li class="col-sm-6">
+            <a class="text-center" data-toggle="pill" href="#matches">
+                Matches
+            </a>
+        </li>
+    </ul>
+    <div class="row tab-content">
+        <div id="players" class="tab-pane fade">
+            <table class="table table-hover table-responsive table-striped ">
+                <thead>
+                    <tr>
+                        <th class="text-center">Player name</th>
+                        <th class="text-center">Team</th>
+                        <th class="text-center">Position</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var i in @Model.Players)
+                        {
+                            <tr>
+                                @for (int x = 1; x <= 3; x++)
+                                {
+                                    <td class="text-center">@i[x]</td>
+                                }
+                                <td>
+                                    <button type="button" data-toggle="modal" data-target="#Modal1" class="open-modal1 btn btn-primary btn-sm" data-url="@i[0]">
+                                        Delete
+                                    </button>
+                                    <button type="button" data-toggle="modal" data-target="#Modal2" class="open-modal2 btn btn-primary btn-sm" data-url="@i[0]">
+                                        Left the league
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="matches" class="tab-pane fade">
+           @await Component.InvokeAsync("Matches")
+            <h2 class="text-center">ِAll Matches</h2><br />
+            <table class="table table-hover table-responsive table-striped table-condensed">
+                <thead>
+                    <tr class="row">
+                        <th class="col-lg-2 text-center">Round number </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var i in Model.Matches)
+                        {
+                            <tr class="row">
+                                <td class="col-lg-1 text-center">@i[6] </td>
+                                <td class="col-lg-2 text-center">@i[1] </td>
+                                <td class="col-lg-1 text-center">@i[2] </td>
+                                <td class="col-lg-4 text-center">@i[3] </td>
+                                <td class="col-lg-1 text-center">@i[4]</td>
+                                <td class="col-lg-2 text-center">@i[5] </td>
+                                <td class="col-lg-1 text-center">
+                                    <button type="button" data-toggle="modal" data-target="#Modal3" class="open-modal3 btn btn-primary btn-sm" data-url="@i[0]">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="Modal1" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Delete player confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this player ?!</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="confirm1" href="#" data-dismiss="modal">Yes</a>
+                <a class="btn btn-primary" id="close1" data-dismiss="modal">No</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="Modal2" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Remove player confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this player from league?!</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="confirm2" href="#" data-dismiss="modal">Yes</a>
+                <a class="btn btn-primary" id="close2" data-dismiss="modal">No</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="Modal3" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Delete match confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this match from league?!</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="confirm3" href="#" data-dismiss="modal">Yes</a>
+                <a class="btn btn-primary" id="close" data-dismiss="modal">No</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $('#confirm1').click(DeletePlayer);
+    $('#confirm2').click(PlayerLeftLeague);
+    $('#confirm3').click(DeleteMatch);
+    function DeletePlayer() {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/DeletePlayer/' + $('.open-modal1').data('url'),
+            success: function (result) {
+                alert("Success!");
+            }
+        })
+    };
+    function PlayerLeftLeague() {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/PlayerLeftLeague/' + $('.open-modal2').data('url'),
+            success: function (result) {
+                alert("Success!");
+            }
+        })
+    };
+    function DeletePlayer() {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/DeleteMatch/' + $('.open-modal3').data('url'),
+            success: function (result) {
+                alert("Success!");
+            }
+        })
+    };
+</script>

@@ -260,7 +260,8 @@ namespace Web.Controllers
         {
             if ((int)HttpContext.Session.GetInt32("ID") == null)
             {
-                return (new NotFoundResult());
+                return View("/home/index");
+          //      return (new NotFoundResult());
             }
             return View();
         }
