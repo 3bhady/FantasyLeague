@@ -1,4 +1,5 @@
 ﻿/// <autosync enabled="true" />
+/// <reference path="js/searchengine.js" />
 /// <reference path="js/site.js" />
 /// <reference path="js/transfer.js" />
 /// <reference path="lib/bootstrap/dist/js/bootstrap.js" />

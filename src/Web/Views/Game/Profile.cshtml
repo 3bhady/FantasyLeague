@@ -1,7 +1,7 @@
 ﻿
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
-
+<input type="text" class="input-group-btn" id="search">
 <div id="userInfo" class="col-lg-11">
     <table class="table">
         <thead>
@@ -32,7 +32,7 @@
     </table>
 </div>
 
-<script>
+<script>    
     var id =@Model;
            (function UpdateUserInfo() {
                $.ajax({
@@ -78,3 +78,4 @@
     ///pitch;;
 
 </script>
+

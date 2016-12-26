@@ -344,5 +344,13 @@ namespace Web.Controllers
          
             return Json(result);
         }
+        [HttpGet("/Search/{key?}")]
+        public IActionResult SearchEngine(string key )
+        {
+            string query = "Select user_id,username from Users where username like '%" + key + "%'";
+            var result = dbreader.GetData(query, "Dictionary");
+
+            return Json(result);
+        }
     }
 }
