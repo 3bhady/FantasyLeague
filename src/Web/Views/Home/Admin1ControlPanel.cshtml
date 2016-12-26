@@ -4,256 +4,299 @@
 
 
 
+<div style="padding-top:20px">
+    <ul class="nav nav-pills">
+        <li>
+            <a class="active text-center " data-toggle="pill" href="#addmatch">
+                Add Match to league
+            </a>
+        </li>
+        <li>
+            <a class="text-center" data-toggle="pill" href="#updatematchdate">
+                Postpone match
+            </a>
+        </li>
+        <li>
+            <a class="text-center" data-toggle="pill" href="#addplayer">
+                Add player to league
+            </a>
+        </li>
+        <li>
+            <a class="text-center" data-toggle="pill" href="#transferplayer">
+                Transfer player
+            </a>
+        </li>
+        <li>
+            <a class="text-center" data-toggle="pill" href="#addteam">
+                Add team to league
+            </a>
+        </li>
+        <li>
+            <a class="text-center" data-toggle="pill" href="#addnewspost">
+                Add news post
+            </a>
+        </li>
+        <li>
+            <a class="text-center" data-toggle="pill" href="#updateplayerpoints">
+                Update Player Points
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div id="addmatch" class="tab-pane fade in active">
+            <h2>Enter Match info</h2>
 
-<div class="container ">
-    <div class="row">
-        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-8 ">
-            <div class="nav nav-pills nav-stacked">
-                <a class="list-group-item active text-center" data-toggle="pill" href="#addmatch">
-                    Add Match to league
-                </a>
-                <a class="list-group-item text-center" data-toggle="pill" href="#updatematchdate">
-                    Postpone match
-                </a>
-                <a class="list-group-item text-center" data-toggle="pill" href="#addplayer">
-                    Add player to league
-                </a>
-                <a class="list-group-item text-center" data-toggle="pill" href="#transferplayer">
-                    Transfer player
-                </a>
-                <a class="list-group-item text-center" data-toggle="pill" href="#addteam">
-                    Add team to league
-                </a>
-                <a class="list-group-item text-center" data-toggle="pill" href="#addnewspost">
-                    Add news post
-                </a>
-                <a class="list-group-item text-center" data-toggle="pill" href="#updateplayerpoints">
-                    Update Player Points
-                </a>
-            </div>
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="AddMatch" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Home Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.Match.HomeTeamId asp-items="@Model.AllTeams">
+                            <option>Select Team</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Away Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.Match.AwayTeamId asp-items="@Model.AllTeams">
+                            <option>Select Team</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Round number</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" id="roundnumber" spellcheck="false" asp-for="@Model.Match.RoundNumber" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Round number</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="datetime-local" id="date" spellcheck="false" asp-for="@Model.Match.Date" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Add Match</button>
+                    </div>
+                </div>
+
+            </form>
         </div>
-        <div class="tab-content col-lg-10 col-md-10 col-sm-6 col-xs-4 ">
-            <div id="addmatch" class="tab-pane fade in active">
-                <h3>Enter Match info</h3>
+        <div id="updatematchdate" class="tab-pane fade">
+            <h3>Enter Match info</h3>
 
-                <form asp-controller="Home" role="form" asp-action="AddMatch" method="post">
-                    <div>
-                        Home Team:
-                        <select asp-for=@Model.Match.HomeTeamId
-                                asp-items="@Model.AllTeams">
-
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="UpdateMatchDate" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Home Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.Match.HomeTeamId asp-items="@Model.AllTeams">
                             <option>Select Team</option>
-
                         </select>
                     </div>
-                    <div>
-                        Away Team:
-                        <select asp-for=@Model.Match.AwayTeamId
-                                asp-items="@Model.AllTeams">
-
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Away Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.Match.AwayTeamId asp-items="@Model.AllTeams">
                             <option>Select Team</option>
-
                         </select>
                     </div>
-                    <div>
-                        Round number
-                        <input type="text" id="roundnumber" spellcheck="false" asp-for="@Model.Match.RoundNumber" />
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Round number</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" id="roundnumber" spellcheck="false" asp-for="@Model.Match.RoundNumber" />
                     </div>
-                    <div>
-                        Date
-                        <input type="datetime-local" id="matchdate" spellcheck="false" asp-for="@Model.Match.Date" />
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Date</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="datetime-local" id="date" spellcheck="false" asp-for="@Model.Match.Date" />
                     </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Add Match" id="addmatch" class="button" />
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Update</button>
                     </div>
+                </div>
 
-                </form>
-            </div>
-            <div id="updatematchdate" class="tab-pane fade">
-                <h3>Enter Match info</h3>
+            </form>
+        </div>
+        <div id="addplayer" class="tab-pane fade">
+            <h3>Enter Player info</h3>
 
-                <form asp-controller="Home" role="form" asp-action="UpdateMatchDate" method="post">
-                    <div>
-                        Home Team:
-                        <select asp-for=@Model.Match.HomeTeamId
-                                asp-items="@Model.AllTeams">
-
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="AddPlayer" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Name</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="playername" spellcheck="false" asp-for="@Model.Player.Name" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.SelectedTeamID asp-items="@Model.AllTeams">
                             <option>Select Team</option>
-
                         </select>
                     </div>
-                    <div>
-                        Away Team:
-                        <select asp-for=@Model.Match.AwayTeamId
-                                asp-items="@Model.AllTeams">
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Position</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="playerposition" spellcheck="false" asp-for="@Model.Player.Type" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Birthdate</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="date" id="playerdate" spellcheck="false" asp-for="@Model.Player.BirthDate" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Cost</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" step="0.1" min="0" value="0" id="playercost" spellcheck="false" asp-for="@Model.Player.Cost" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Tshirt number</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" id="playernumber" spellcheck="false" asp-for="@Model.Player.TshirtNumber" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Add player</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="transferplayer" class="tab-pane fade">
+            <h3>Enter Player info</h3>
 
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="TransferPlayer" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Name</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="playername" spellcheck="false" asp-for="@Model.Player.Name" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.Player.TeamId asp-items="@Model.AllTeams">
                             <option>Select Team</option>
-
                         </select>
                     </div>
-                    <div>
-                        Round number
-                        <input type="text" id="roundnumber" spellcheck="false" asp-for="@Model.Match.RoundNumber" />
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Tshirt number</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" id="playernumber" spellcheck="false" asp-for="@Model.Player.TshirtNumber" />
                     </div>
-                    <div>
-                        New Date
-                        <input type="datetime-local" id="matchdate" spellcheck="false" asp-for="@Model.Match.Date" />
-                    </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Update Match" id="updatematchdate" class="button" />
-                    </div>
-
-                </form>
-            </div>
-            <div id="addplayer" class="tab-pane fade">
-                <h3>Enter Player info</h3>
-
-                <form asp-controller="Home" role="form" asp-action="AddPlayer" method="post">
-                    <div>
-                        Name
-                        <input type="text" id="playername" spellcheck="false" asp-for="@Model.Player.Name" />
-                    </div>
-                    <div>
-                        Team:
-                        <select asp-for=@Model.SelectedTeamID
-                                asp-items="@Model.AllTeams">
-
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">New Team</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.SelectedTeamID asp-items="@Model.AllTeams">
                             <option>Select Team</option>
-
                         </select>
                     </div>
-                    <div>
-                        Position
-                        <input type="text" id="playerposition" spellcheck="false" asp-for="@Model.Player.Type" />
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">New Tshirt number</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" id="playernumber" spellcheck="false" asp-for="@Model.NewTshirtNumber" />
                     </div>
-                    <div>
-                        Birthdate
-                        <input type="date" id="playerdate" spellcheck="false" asp-for="@Model.Player.BirthDate" />
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Transfer</button>
                     </div>
-                    <div>
-                        Cost
-                        <input type="number" step="0.1" min="0" value="0" id="playercost" spellcheck="false" asp-for="@Model.Player.Cost" />
+                </div>
+
+            </form>
+        </div>
+        <div id="addteam" class="tab-pane fade">
+            <h3>Enter Team info</h3>
+
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="AddTeam" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Name</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="teamname" spellcheck="false" asp-for="@Model.Team.Name" />
                     </div>
-                    <div>
-                        Tshirt number
-                        <input type="number" id="playernumber" spellcheck="false" asp-for="@Model.Player.TshirtNumber" />
-
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Add team</button>
                     </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Add Player" id="player" class="button" />
+                </div>
+
+            </form>
+        </div>
+        <div id="addnewspost" class="tab-pane fade">
+            <h3>Enter News post info</h3>
+
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="AddNewsPost" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Title</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="posttitle" spellcheck="false" asp-for="@Model.NewsPost.Title" />
                     </div>
-
-                </form>
-            </div>
-            <div id="transferplayer" class="tab-pane fade">
-                <h3>Enter Player info</h3>
-
-                <form asp-controller="Home" role="form" asp-action="TransferPlayer" method="post">
-                    <div>
-                        Name
-                        <input type="text" id="playername" spellcheck="false" asp-for="@Model.Player.Name" />
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Body</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="postbody" spellcheck="false" asp-for="@Model.NewsPost.Body" />
                     </div>
-                    <div>
-                        Team:
-                        <select asp-for=@Model.Player.TeamId
-                                asp-items="@Model.AllTeams">
-
-                            <option>Select Team</option>
-
-                        </select>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Post</button>
                     </div>
-                    <div>
-                        Tshirt number
-                        <input type="number" id="playernumber" spellcheck="false" asp-for="@Model.Player.TshirtNumber" />
+                </div>
 
-                    </div>
-                    <div>
-                        New team:
-                        <select asp-for=@Model.SelectedTeamID
-                                asp-items="@Model.AllTeams">
+            </form>
+        </div>
+        <div id="updateplayerpoints" class="tab-pane fade">
+            <h3>Enter Player Action</h3>
 
-                            <option>Select Team</option>
-
-                        </select>
-                    </div>
-                    <div>
-                        New Tshirt number
-                        <input type="number" id="playernumber" spellcheck="false" asp-for="@Model.NewTshirtNumber" />
-
-                    </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Transfer Player" Player" id="transferplayer" class="button" />
-                    </div>
-
-                </form>
-            </div>
-            <div id="addteam" class="tab-pane fade">
-                <h3>Enter Team info</h3>
-
-                <form asp-controller="Home" role="form" asp-action="AddTeam" method="post">
-                    <div>
-                        Name
-                        <input type="text" id="teamname" spellcheck="false" asp-for="@Model.Team.Name" />
-                    </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Add Team" id="team" class="button" />
-                    </div>
-
-                </form>
-            </div>
-            <div id="addnewspost" class="tab-pane fade">
-                <h3>Enter News post info</h3>
-
-                <form asp-controller="Home" role="form" asp-action="AddNewsPost" method="post">
-                    <div>
-                        Title
-                        <input type="text" id="posttitle" spellcheck="false" asp-for="@Model.NewsPost.Title" />
-                    </div>
-                    <div>
-                        Body
-                        <input type="text" id="postbody" spellcheck="false" asp-for="@Model.NewsPost.Body" />
-                    </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Post" id="news" class="button" />
-                    </div>
-
-                </form>
-            </div>
-            <div id="updateplayerpoints" class="tab-pane fade">
-                <h3>Enter Player Action</h3>
-
-                <form asp-controller="Home" role="form" asp-action="UpdatePlayer" method="post">
-                    <div>
-                        Player
-                        <select asp-for=@Model.SelectedPlayerID
-                                asp-items="@Model.AllPlayers">
-
+            <form class="form-horizontal" asp-controller="Home" role="form" asp-action="UpdatePlayer" method="post">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Player</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.SelectedPlayerID asp-items="@Model.AllPlayers">
                             <option>Select Player</option>
-
                         </select>
                     </div>
-                    <div>
-                        Action
-                        <select asp-for=@Model.SelectedAction
-                                asp-items="@Model.PlayerActions">
-
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Action</label>
+                    <div class="col-sm-9 center-block">
+                        <select class="form-control" asp-for=@Model.SelectedAction asp-items="@Model.PlayerActions">
                             <option>Select Action</option>
-
                         </select>
                     </div>
-                    <div>
-                        <br />
-                        <input type="submit" value="Update" id="playeraction" class="button" />
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 col-sm-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block">Update</button>
                     </div>
+                </div>
 
-                </form>
-            </div>
+            </form>
         </div>
     </div>
+</div>
+<div class="text-center">
+    <form class="form-horizontal" asp-controller="Home" role="form" asp-action="StartRound" method="post">
+
+        <div class="form-group">
+            <div class="col-sm-2 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary btn-block">Start Round</button>
+            </div>
+        </div>
+    </form>
 </div>
