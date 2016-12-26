@@ -40,22 +40,35 @@
             
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    @{if (Context.Session?.GetInt32("AdminID") != null)
+                        {
+                    <li><a asp-area="" asp-controller="Home" asp-action="AdminIndex">Home</a></li>
+
+                        }
+                        else { <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                            }
+                        }
                    @{
-                       if (Context.Session?.GetInt32("ID") != null)
+                       if (Context.Session?.GetInt32("ID") != null || Context.Session?.GetInt32("AdminID") != null)
                        {
                     <li><a asp-area="" asp-controller="Home" asp-action="Competitions">Competitions</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="News">News</a></li>
+                           if (Context.Session?.GetInt32("AdminID") != null)
+                           {
+                    <li><a asp-area="" asp-controller="Home" asp-action="Admin1ControlPanel">Control Panel</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="StartRound">Start Round</a></li>
+                           }
+                           else
+                           {
                     <li><a asp-area="" asp-controller="Game" asp-action="Squad">Squad</a></li>
                     <li><a asp-area="" asp-controller="Game" asp-action="Transfer">Transfer</a></li>
                     <li><a asp-area="" asp-route-id="@Context.Session?.GetInt32("ID")" asp-controller="Game" asp-action="Profile">Profile</a></li>
+                               }
+                           }
                        }
                 }
+                       }
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-
-                  <!--  <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li> -->
-
                 </ul>
                   <ul class="nav navbar-nav">
                  
@@ -80,17 +93,17 @@
                 </form>
                 <ul class="nav navbar-nav navbar-right">
                    @{
-                       if (Context.Session?.GetInt32("ID") == null&&Context.Session?.GetInt32("AdminID")==null)
+                       if (Context.Session?.GetInt32("ID") == null && Context.Session?.GetInt32("AdminID") == null) 
                        {
                         <li><a asp-controller="Home" asp-action="Signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                           
-                       <li><a   id="#myModal" data-target="#myModal"  data-toggle="modal" ><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
 
+                           //<li><a   id="#myModal" data-target="#myModal"  data-toggle="modal" ><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                        }
                        else
                        {
 
-                      <li><a asp-controller="Home" asp-action="Logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+                        <li><a asp-controller="Home" asp-action="ChangePassword"> Change Password</a></li>
+                        <li><a asp-controller="Home" asp-action="Logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
                
                        }
                 }

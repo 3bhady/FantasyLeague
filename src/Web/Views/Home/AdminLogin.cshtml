@@ -6,12 +6,24 @@
 </head>
 <body>
     <h1>@ViewBag.Message</h1>
-<form asp-controller="Home" asp-action="AdminLogin" method="post" class="form-group f">
-    <h1>Admin Login</h1>
-    <input placeholder="Username" type="text" asp-for="Username"/>
-    <input placeholder="*****" type="password" asp-for="Password"/>
-    <input type="submit" value="Login"/>
-</form>
+    <form class="form-horizontal" asp-controller="Home" role="form" asp-action="AdminLogin" method="post">
+        <h1>Admin Login</h1>
+        <div class="form-group">
+            <div class="col-sm-9 center-block">
+                <input class="form-control" placeholder="Username" type="text" asp-for="Username" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-9 center-block">
+                <input class="form-control" placeholder="*****" type="password" asp-for="Password" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </div>
+        </div>
+    </form>
 
 </body>
 
